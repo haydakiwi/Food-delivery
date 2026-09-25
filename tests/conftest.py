@@ -23,18 +23,24 @@ def sample_restaurants() -> list[dict[str, object]]:
 
     return [
         {
-            "id": 1,
+            "id": "1",
             "name": "Coastal Curry",
             "cuisine": "Indian",
             "rating": 4.7,
-            "delivery_time": 30,
+            "delivery_time_minutes": 30,
+            "delivery_fee": 3.99,
+            "is_open": True,
+            "address": "123 Main St",
         },
         {
-            "id": 2,
+            "id": "2",
             "name": "Maple Sushi",
             "cuisine": "Japanese",
             "rating": 4.5,
-            "delivery_time": 25,
+            "delivery_time_minutes": 25,
+            "delivery_fee": 2.99,
+            "is_open": True,
+            "address": "456 Maple Ave",
         },
     ]
 

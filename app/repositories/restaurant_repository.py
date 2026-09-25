@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-class RestaruantDataError(Exception):
+class RestaurantDataError(Exception):
     """Raised when the restaurant data file is missing or malformed."""
 
 class RestaurantRepository:
@@ -27,7 +27,7 @@ class RestaurantRepository:
         try: 
             with self.data_path.open(encoding="utf-8") as f:
                 data = json.load(f)
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError as exc:
             raise RestaurantDataError(
                 f"Invalid JSON in {self.data_path}: {exc.msg}"
             ) from exc

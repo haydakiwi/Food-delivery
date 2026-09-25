@@ -19,7 +19,16 @@ def test_restaurants_match_the_agreed_schema(client: TestClient) -> None:
     response = client.get("/restaurants")
 
     assert response.status_code == 200
-    required_fields = {"id", "name", "cuisine", "rating", "delivery_time"}
+    required_fields = {
+    "id",
+    "name",
+    "cuisine",
+    "rating",
+    "delivery_time_minutes",
+    "delivery_fee",
+    "is_open",
+    "address",
+}
     assert response.json(), "The restaurant list must not be empty"
     assert all(required_fields <= restaurant.keys() for restaurant in response.json())
 

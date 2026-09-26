@@ -15,4 +15,13 @@ The whole group has used AI for coding and generating ideas.
 - **PR or commit:** Role C implementation commit `292cd00`.
 
 
-
+## Entry — Role A
+ 
+- **Student(s):** Hayden
+- **Artifact:** `app/main.py`, `app/core/config.py`, `.gitignore`, `requirements.txt`, project repository structure, and GitHub repository setup
+- **Label:** AI-ASSISTED
+- **AI tool:** Microsoft Copilot
+- **Purpose:** Used Microsoft Copilot to help understand the M0 requirements, set up the FastAPI project structure, create the `/health` and initial `/restaurants` endpoints, configure Git/GitHub, create the `.gitignore` file, and clarify the required architecture and workflow.
+- **Influence:** AI guidance helped with project setup, FastAPI configuration, endpoint implementation, repository organization, and Git commands. I reviewed, tested, and made the final implementation decisions myself.
+- **Validation:** Successfully ran the FastAPI application using Uvicorn, verified the `/health` and `/restaurants` endpoints returned HTTP 200 responses, confirmed `/docs` was accessible, checked the project structure against the milestone requirements, and successfully committed and pushed changes to GitHub.
+- **PR or commit:** Initial project foundation commits and subsequent setup/configuration commits.

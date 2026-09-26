@@ -3,23 +3,16 @@
 The whole group has used AI for coding and generating ideas.
 
 
-## Role C — Schema, Service, and Route
-**AI use classification:** AI-ASSISTED
+## Entry — Role C
 
-AI was used to help understand the project requirements, plan the implementation steps, review code, troubleshoot integration issues, and verify Git/GitHub workflow.
+- **Student(s):** Jay Patel
+- **Artifact:** `app/schemas/restaurant.py`, `app/services/restaurant_service.py`, `app/api/routes/restaurants.py`, `app/main.py`, and `tests/test_restaurant_service.py`
+- **Label:** AI-ASSISTED
+- **AI tool:** ChatGPT
+- **Purpose:** Used ChatGPT to help understand the Role C requirements, plan the implementation, troubleshoot integration issues, review the code, and assist with testing and Git/GitHub workflow.
+- **Influence:** AI guidance helped with the structure and implementation of the Restaurant schema, service layer, `/restaurants` route, router integration, and service test. I reviewed and understood the code and made the final implementation decisions.
+- **Validation:** Ran the pytest suite, manually tested the `/restaurants` and `/health` endpoints, verified the API through FastAPI Swagger documentation, and confirmed that the restaurant response matched the required Pydantic schema. The final integrated project passed all 14 tests.
+- **PR or commit:** Role C implementation commit `292cd00`.
 
-The Role C implementation included:
-- Creating the Pydantic `Restaurant` schema.
-- Creating the `RestaurantService` layer.
-- Creating the `GET /restaurants` FastAPI route.
-- Connecting the restaurant router to the main FastAPI application.
-- Adding a service-layer test using a fake repository.
-- Integrating and testing the Role C implementation with the repository layer.
 
-AI assistance was used for guidance, explanations, debugging, and code review. I reviewed and understood the implementation, tested the functionality, and validated the final work using pytest and the FastAPI Swagger documentation.
 
-**Validation performed:**
-- Ran the project test suite with pytest.
-- Verified the `/restaurants` endpoint returned HTTP 200 and the expected restaurant data.
-- Verified the endpoint response matched the Pydantic `Restaurant` schema.
-- Tested integration between the route, service, and repository layers.

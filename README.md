@@ -84,7 +84,10 @@ Each restaurant uses these fields:
 - `name`
 - `cuisine`
 - `rating`
-- `delivery_time`
+- `delivery_time_minutes`
+- `delivery_fee`
+- `is_open`
+- `address`
 
 ## Run the tests
 

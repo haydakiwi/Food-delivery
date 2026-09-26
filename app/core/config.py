@@ -1,1 +1,3 @@
-DATA_PATH = "data/restaurants.json"
+import os
+
+DATA_PATH = os.getenv("DATA_PATH", "data/restaurants.json")

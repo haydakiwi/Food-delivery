@@ -1,0 +1,12 @@
+[
+    {"id": "item_001", "restaurant_id": "rest_001", "name": "Salmon Nigiri", "description": "Two pieces of fresh salmon over rice", "price": 6.50, "category": "Sushi", "is_available": true},
+    {"id": "item_002", "restaurant_id": "rest_001", "name": "Miso Soup", "description": "Tofu, seaweed and green onion", "price": 3.50, "category": "Sides", "is_available": true},
+    {"id": "item_003", "restaurant_id": "rest_002", "name": "Classic Cheeseburger", "description": "Beef patty, cheddar, lettuce, tomato", "price": 12.99, "category": "Burgers", "is_available": true},
+    {"id": "item_004", "restaurant_id": "rest_002", "name": "Fries", "description": "Crispy shoestring fries", "price": 4.99, "category": "Sides", "is_available": true},
+    {"id": "item_005", "restaurant_id": "rest_003", "name": "Spaghetti Carbonara", "description": "Egg, pecorino, pancetta and black pepper", "price": 17.50, "category": "Pasta", "is_available": true},
+    {"id": "item_006", "restaurant_id": "rest_003", "name": "Tiramisu", "description": "Espresso-soaked ladyfingers with mascarpone", "price": 7.99, "category": "Desserts", "is_available": false},
+    {"id": "item_007", "restaurant_id": "rest_004", "name": "Butter Chicken", "description": "Creamy tomato curry with tandoori chicken", "price": 16.99, "category": "Curries", "is_available": true},
+    {"id": "item_008", "restaurant_id": "rest_004", "name": "Garlic Naan", "description": "Tandoor-baked flatbread with garlic butter", "price": 3.99, "category": "Breads", "is_available": true},
+    {"id": "item_009", "restaurant_id": "rest_005", "name": "Al Pastor Tacos", "description": "Three tacos with marinated pork and pineapple", "price": 11.99, "category": "Tacos", "is_available": true},
+    {"id": "item_010", "restaurant_id": "rest_005", "name": "Churros", "description": "Cinnamon sugar churros with chocolate dip", "price": 5.99, "category": "Desserts", "is_available": true}
+]

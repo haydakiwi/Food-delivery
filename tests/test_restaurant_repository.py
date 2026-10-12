@@ -26,14 +26,13 @@ def test_get_all_returns_all_restaurants(data_file):
     restaurants = repo.get_all()
     assert restaurants == SAMPLE_RESTAURANTS
 
-def test_get_by_id_returns_none_for_unknown_id(data_file):
+def test_get_by_id_returns_matching_restaurant(data_file):
     repo = RestaurantRepository(data_file)
     assert repo.get_by_id("test_002")["name"] == "Test Burger"
 
-def test_get_by_id_returns_restaurant_for_unknown_id(data_file):
+def test_get_by_id_returns_none_for_unknown_id(data_file):
     repo = RestaurantRepository(data_file)
     assert repo.get_by_id("does_not_exist") is None
-    """Assert means that the condition must be true, or else the test fails"""
 
 """Failure cases"""
 def test_missing_file_raises(tmp_path):
@@ -98,13 +97,13 @@ def test_first_restaurant_in_empty_file_gets_rest_001(tmp_path):
     path.write_text("[]", encoding="utf-8")
     assert RestaurantRepository(path).create({"name": "First"})["id"] == "rest_001"
 
-def test_update_changes_only_given_fields(writable_file):
+def test_created_restaurant_survives_restart(writable_file):
     RestaurantRepository(writable_file).create({"name": "Pho Place"})
     restarted = RestaurantRepository(writable_file)
     assert restarted.get_by_id("rest_003")["name"] == "Pho Place"
     assert len(restarted.get_all()) == 3
 
-def test_created_restaurant_survives_restart(writable_file):
+def test_update_changes_only_given_fields(writable_file):
     repo = RestaurantRepository(writable_file)
     updated = repo.update("rest_002", {"name": "Better Burger"})
     assert updated["name"] == "Better Burger"

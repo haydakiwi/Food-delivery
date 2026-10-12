@@ -25,3 +25,15 @@ The whole group has used AI for coding and generating ideas.
 - **Influence:** AI guidance helped with project setup, FastAPI configuration, endpoint implementation, repository organization, and Git commands. I reviewed, tested, and made the final implementation decisions myself.
 - **Validation:** Successfully ran the FastAPI application using Uvicorn, verified the `/health` and `/restaurants` endpoints returned HTTP 200 responses, confirmed `/docs` was accessible, checked the project structure against the milestone requirements, and successfully committed and pushed changes to GitHub.
 - **PR or commit:** Initial project foundation commits and subsequent setup/configuration commits.
+
+
+## Entry — Milestone 1 Part B: Customer Endpoints
+
+- **Student(s):** Shukan
+- **Artifact:** `app/schemas/menu.py`, `app/services/restaurant_service.py`, `app/api/routes/restaurants.py`, `tests/conftest.py`, `tests/test_restaurant_service.py`, and `tests/test_restaurants.py`
+- **Label:** AI-ASSISTED
+- **AI tool:** OpenAI Codex
+- **Purpose:** Used Codex to review the Milestone 1 requirements, plan the customer-facing API contract, implement the service and route layers, document the endpoints in OpenAPI, and create automated tests.
+- **Influence:** AI assistance contributed to the restaurant search/filter logic, restaurant and menu lookup flows, domain not-found errors, HTTP 404 mapping, API descriptions and parameters, and isolated service and endpoint tests. I reviewed the implementation and remain responsible for understanding, validating, and explaining it.
+- **Validation:** Ran the complete pytest suite and confirmed all 55 tests passed. Verified tests cover restaurant listing, case-insensitive search, combined filters, restaurant details, menu and item retrieval, unknown resources, cross-restaurant item protection, and generated OpenAPI documentation.
+- **PR or commit:** Milestone 1 Part B customer-endpoints feature branch; update this field with the pull request or final commit before submission.

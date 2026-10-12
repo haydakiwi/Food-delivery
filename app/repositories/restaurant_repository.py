@@ -1,4 +1,5 @@
-import json
+import json 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,41 @@ class RestaurantRepository:
             if restaurant["id"] == restaurant_id:
                 return restaurant
         return None    
+
+    def create(self, restaurant_data: dict[str, Any]) -> dict[str, Any]:
+        """Create a new restaurant and return it."""
+        restaurants = self._load()
+        new_restaurant = {**restaurant_data, "id": self._next_id(restaurants)}
+        restaurants.append(new_restaurant)
+        self._save(restaurants)
+        return new_restaurant
+
+    def update(self, restaurant_id: str, changes: dict[str, Any]) -> dict[str, Any] | None:
+        """Update an existing restaurant and return it."""
+        restaurants = self._load()
+        for restaurant in restaurants:
+            if restaurant["id"] == restaurant_id:
+                changes = {key: value for key, value in changes.items() if key != "id"}
+                restaurant.update(changes)
+                self._save(restaurants)
+                return restaurant
+        return None
+
+    def _next_id(self, restaurants: list[dict[str, Any]]) -> str:
+
+        numbers = []
+        for restaurant in restaurants:
+            prefix, _, number = restaurant["id"].partition("_")
+            if prefix == "rest" and number.isdigit():
+                numbers.append(int(number))
+        next_number = max(numbers, default=0) + 1
+        return f"rest_{next_number:03d}"
+
+    def _save(self, restaurants: list[dict[str, Any]]) -> None:
+        temp_path = self.data_path.with_suffix(".tmp")
+        with temp_path.open("w", encoding="utf-8") as f:
+            json.dump(restaurants, f, indent=4)
+        os.replace(temp_path, self.data_path)
 
     def _load(self) -> list[dict[str, Any]]:
         if not self.data_path.exists():

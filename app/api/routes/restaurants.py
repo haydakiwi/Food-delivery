@@ -6,9 +6,10 @@ from app.core.config import DATA_PATH, MENU_ITEMS_PATH
 from app.repositories.menu_item_repository import MenuItemRepository
 from app.repositories.restaurant_repository import RestaurantRepository
 from app.schemas.menu import Menu
-from app.schemas.menu_item import MenuItem
-from app.schemas.restaurant import Restaurant
+from app.schemas.menu_item import MenuItem, MenuItemCreate, MenuItemUpdate
+from app.schemas.restaurant import Restaurant, RestaurantCreate, RestaurantUpdate
 from app.services.restaurant_service import (
+    DuplicateRestaurantNameError,
     MenuItemNotFoundError,
     RestaurantNotFoundError,
     RestaurantService,
@@ -121,6 +122,126 @@ def get_restaurant_menu_item(
 ) -> MenuItem:
     try:
         return service.get_menu_item(restaurant_id, item_id)
+    except RestaurantNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Restaurant '{restaurant_id}' not found",
+        ) from exc
+    except MenuItemNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=(
+                f"Menu item '{item_id}' was not found for restaurant "
+                f"'{restaurant_id}'"
+            ),
+        ) from exc
+
+
+@router.post(
+    "",
+    response_model=Restaurant,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a restaurant",
+    description="Create a new restaurant with a server-generated stable ID.",
+    responses={
+        400: {"description": "A restaurant with this name already exists"},
+        422: {"description": "Invalid restaurant data"},
+    },
+)
+def create_restaurant(data: RestaurantCreate) -> Restaurant:
+    try:
+        return service.create_restaurant(data)
+    except DuplicateRestaurantNameError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Restaurant '{data.name}' already exists",
+        ) from exc
+
+
+@router.patch(
+    "/{restaurant_id}",
+    response_model=Restaurant,
+    status_code=status.HTTP_200_OK,
+    summary="Update a restaurant",
+    description="Update selected fields of an existing restaurant.",
+    responses={
+        400: {"description": "A restaurant with this name already exists"},
+        404: {"description": "Restaurant not found"},
+        422: {"description": "Invalid restaurant data"},
+    },
+)
+def update_restaurant(
+    restaurant_id: Annotated[
+        str,
+        Path(description="Stable restaurant identifier", examples=["rest_001"]),
+    ],
+    data: RestaurantUpdate,
+) -> Restaurant:
+    try:
+        return service.update_restaurant(restaurant_id, data)
+    except RestaurantNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Restaurant '{restaurant_id}' not found",
+        ) from exc
+    except DuplicateRestaurantNameError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Restaurant '{data.name}' already exists",
+        ) from exc
+
+
+@router.post(
+    "/{restaurant_id}/menu/items",
+    response_model=MenuItem,
+    status_code=status.HTTP_201_CREATED,
+    summary="Add a menu item",
+    description="Add a new menu item to an existing restaurant.",
+    responses={
+        404: {"description": "Restaurant not found"},
+        422: {"description": "Invalid menu item data"},
+    },
+)
+def create_menu_item(
+    restaurant_id: Annotated[
+        str,
+        Path(description="Stable restaurant identifier", examples=["rest_001"]),
+    ],
+    data: MenuItemCreate,
+) -> MenuItem:
+    try:
+        return service.create_menu_item(restaurant_id, data)
+    except RestaurantNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Restaurant '{restaurant_id}' not found",
+        ) from exc
+
+
+@router.patch(
+    "/{restaurant_id}/menu/items/{item_id}",
+    response_model=MenuItem,
+    status_code=status.HTTP_200_OK,
+    summary="Update a menu item",
+    description="Update selected fields of a menu item belonging to a restaurant.",
+    responses={
+        404: {"description": "Restaurant or menu item not found"},
+        422: {"description": "Invalid menu item data"},
+    },
+)
+def update_menu_item(
+    restaurant_id: Annotated[
+        str,
+        Path(description="Stable restaurant identifier", examples=["rest_001"]),
+    ],
+    item_id: Annotated[
+        str,
+        Path(description="Stable menu-item identifier", examples=["item_001"]),
+    ],
+    data: MenuItemUpdate,
+) -> MenuItem:
+    try:
+        return service.update_menu_item(restaurant_id, item_id, data)
     except RestaurantNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

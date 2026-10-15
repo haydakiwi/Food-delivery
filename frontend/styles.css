@@ -1,0 +1,146 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f8;
+  color: #20252b;
+}
+
+.hero {
+  background: #20252b;
+  color: white;
+  padding: 48px 24px;
+}
+
+.hero > div, .container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero h1 { margin: 4px 0 8px; font-size: 2.2rem; }
+.hero p { margin: 0; }
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .75;
+}
+
+.container {
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+
+h2, h3 { margin-top: 0; }
+
+.filters {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr auto auto;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+input, select, button {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 7px;
+  border: 1px solid #c9ced4;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: #20252b;
+  color: white;
+  font-weight: 700;
+}
+
+button.secondary {
+  background: #e9edf1;
+  color: #20252b;
+}
+
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.restaurant-card {
+  border: 1px solid #dfe3e7;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.restaurant-card h3 { margin-bottom: 6px; }
+.restaurant-card p { margin: 5px 0; color: #59636e; }
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.hidden { display: none; }
+
+.management-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.management-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.management-form .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.management-form .checkbox input {
+  width: auto;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+.status {
+  min-height: 1.3em;
+  color: #59636e;
+}
+
+.menu-item {
+  border-top: 1px solid #e1e5e9;
+  padding: 12px 0;
+}
+
+.menu-item:first-child { border-top: 0; }
+
+.menu-item h4 { margin: 0 0 4px; }
+.menu-item p { margin: 4px 0; color: #59636e; }
+
+.error { color: #a12626; }
+
+@media (max-width: 800px) {
+  .filters, .management-form { grid-template-columns: 1fr; }
+}

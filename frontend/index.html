@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Delivery</title>
+  <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Food Delivery</p>
+      <h1>Find a restaurant</h1>
+      <p>Browse restaurants, inspect menus, and manage restaurant information.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2>Restaurants</h2>
+      <form id="filter-form" class="filters">
+        <input id="search" type="search" placeholder="Search by name">
+        <input id="cuisine" type="text" placeholder="Cuisine">
+        <select id="open-status">
+          <option value="">Any status</option>
+          <option value="true">Open</option>
+          <option value="false">Closed</option>
+        </select>
+        <button type="submit">Search</button>
+        <button type="button" id="clear-filters" class="secondary">Clear</button>
+      </form>
+      <p id="list-status" class="status"></p>
+      <div id="restaurant-list" class="restaurant-grid"></div>
+    </section>
+
+    <section id="details-panel" class="panel hidden">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Selected restaurant</p>
+          <h2 id="restaurant-name">Restaurant</h2>
+        </div>
+        <button type="button" id="close-details" class="secondary">Close</button>
+      </div>
+      <div id="restaurant-details"></div>
+      <h3>Menu</h3>
+      <div id="menu-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Management</p>
+          <h2>Create or update a restaurant</h2>
+        </div>
+      </div>
+
+      <form id="restaurant-form" class="management-form">
+        <input id="restaurant-id" type="hidden">
+
+        <label>
+          Restaurant name
+          <input id="restaurant-name-input" required minlength="1">
+        </label>
+
+        <label>
+          Cuisine
+          <input id="restaurant-cuisine" required minlength="1">
+        </label>
+
+        <label>
+          Rating
+          <input id="restaurant-rating" type="number" min="0" max="5" step="0.1" required>
+        </label>
+
+        <label>
+          Delivery time (minutes)
+          <input id="restaurant-time" type="number" min="0" required>
+        </label>
+
+        <label>
+          Delivery fee
+          <input id="restaurant-fee" type="number" min="0" step="0.01" required>
+        </label>
+
+        <label>
+          Address
+          <input id="restaurant-address" required minlength="1">
+        </label>
+
+        <label class="checkbox">
+          <input id="restaurant-open" type="checkbox">
+          Open
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" id="save-restaurant">Create restaurant</button>
+          <button type="button" id="reset-form" class="secondary">Reset</button>
+        </div>
+      </form>
+      <p id="form-status" class="status"></p>
+    </section>
+  </main>
+
+  <script src="/frontend/app.js"></script>
+</body>
+</html>

@@ -2,9 +2,10 @@
 
 Team: **Food Delivery**
 
-This repository contains the M0 foundation for a small FastAPI food-delivery
-backend. It exposes a health check and a restaurant-list endpoint using the
-required Route -> Service -> Repository -> JSON architecture.
+Milestone 1 implements an integrated restaurant-discovery and menu-browsing
+vertical slice using the required **Route -> Service -> Repository -> JSON**
+architecture. A small browser frontend consumes the REST API for customer
+browsing and restaurant create/update operations.
 
 ## Requirements
 
@@ -13,139 +14,186 @@ required Route -> Service -> Repository -> JSON architecture.
 
 ## Setup
 
-Clone the repository and enter the project directory:
-
 ```bash
 git clone https://github.com/haydakiwi/Food-delivery.git
 cd Food-delivery
-```
-
-Create and activate a virtual environment on macOS or Linux:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-On Windows PowerShell, activate it with:
-
-```powershell
 py -m venv .venv
 .venv\Scripts\Activate.ps1
-```
-
-Install the dependencies:
-
-```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
+On macOS/Linux, use `python3 -m venv .venv` and
+`source .venv/bin/activate`.
+
 ## Run the application
 
-From the repository root, run:
+From the repository root:
 
 ```bash
 python -m uvicorn app.main:app --reload
 ```
 
-The development server is available at `http://127.0.0.1:8000`.
+Open the frontend at:
 
-## Endpoints
+```text
+http://127.0.0.1:8000/frontend/
+```
+
+FastAPI's generated API documentation is available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## Customer API
 
 | Method | Path | Purpose |
 | --- | --- | --- |
 | GET | `/health` | Confirm that the application is running |
-| GET | `/restaurants` | Return the restaurant list |
-| GET | `/docs` | Open the generated Swagger/OpenAPI documentation |
+| GET | `/restaurants` | List restaurants |
+| GET | `/restaurants/{restaurant_id}` | Get restaurant details |
+| GET | `/restaurants/{restaurant_id}/menu` | Get a restaurant menu |
+| GET | `/restaurants/{restaurant_id}/menu/items/{item_id}` | Get one menu item |
+| GET | `/docs` | Generated Swagger/OpenAPI documentation |
 
-Example requests:
+The restaurant list supports:
 
-```bash
-curl http://127.0.0.1:8000/health
-curl http://127.0.0.1:8000/restaurants
+- `search` — case-insensitive restaurant-name search
+- `cuisine` — case-insensitive cuisine filter
+- `is_open` — filter by open/closed status
+
+## Frontend
+
+The frontend is intentionally simple because M1 prioritizes functionality over
+visual design. It provides:
+
+- restaurant listing from the real API;
+- search and cuisine/open-status filtering;
+- restaurant details;
+- restaurant menu and menu-item display;
+- a create/update restaurant form that calls the management API.
+
+Restaurant data is never hard-coded into the frontend. The browser calls the
+FastAPI application with `fetch()` and displays the returned API data.
+
+## Management API
+
+The management form is designed to use the team's restaurant-management
+endpoints:
+
+```text
+POST /restaurants
+PUT  /restaurants/{restaurant_id}
 ```
+
+The request body contains the restaurant fields:
+
+```json
+{
+  "name": "Example Restaurant",
+  "cuisine": "Japanese",
+  "rating": 4.5,
+  "delivery_time_minutes": 30,
+  "delivery_fee": 2.99,
+  "is_open": true,
+  "address": "123 Main St"
+}
+```
+
+The management endpoints are implemented in the team's management feature.
 
 ## Data and configuration
 
-Committed restaurant data lives in `data/restaurants.json`. The application
-data path is configurable with the `DATA_PATH` environment variable so tests
-can use temporary data without changing the committed file.
+Committed data lives in:
 
-Example:
+- `data/restaurants.json`
+- `data/menu_items.json`
 
-```bash
-DATA_PATH=/path/to/restaurants.json python -m uvicorn app.main:app
-```
+The application paths can be overridden with:
 
-Each restaurant uses these fields:
+- `DATA_PATH`
+- `MENU_ITEMS_PATH`
 
-- `id`
-- `name`
-- `cuisine`
-- `rating`
-- `delivery_time_minutes`
-- `delivery_fee`
-- `is_open`
-- `address`
+Tests use temporary files and do not modify committed application data.
 
 ## Run the tests
-
-Run the complete test suite from the repository root:
-
-```bash
-python -m pytest
-```
-
-For more detail:
 
 ```bash
 python -m pytest -v
 ```
 
-The tests create their own restaurant files in pytest temporary directories.
-They never modify `data/restaurants.json`. The suite covers the health endpoint,
-the restaurant-list endpoint, the response fields, a missing data file, and an
-invalid JSON file.
+## Continuous Integration
+
+GitHub Actions is configured in `.github/workflows/ci.yml`.
+
+The workflow runs automatically on:
+
+- pushes to `main`;
+- pull requests targeting `main`; and
+- manual workflow dispatch.
+
+It installs the dependencies and executes the complete pytest suite on Python
+3.11 and 3.12.
 
 ## Repository structure
 
 ```text
 Food-delivery/
+|-- .github/workflows/ci.yml
 |-- app/
 |   |-- api/routes/                 # HTTP route handlers
 |   |-- core/config.py              # Application configuration
 |   |-- repositories/               # JSON data access
-|   |-- schemas/                    # Pydantic response models
+|   |-- schemas/                    # Pydantic models
 |   |-- services/                   # Business logic
 |   `-- main.py                     # FastAPI application entry point
-|-- data/restaurants.json           # Committed restaurant data
-|-- scrum/team-agreement.md         # Versioned team agreement
-|-- tests/                           # Fixtures and automated tests
-|-- requirements.txt                # Python dependencies
+|-- data/                           # Persistent JSON data
+|-- frontend/
+|   |-- index.html                  # Browser UI
+|   |-- app.js                      # API integration
+|   `-- styles.css                  # Basic presentation
+|-- docs/                           # M1 documentation
+|-- scrum/                          # Scrum meeting notes
+|-- tests/                          # Automated tests
+|-- requirements.txt
 `-- README.md
 ```
 
 ## Request flow
 
-`GET /restaurants` follows this path:
+A customer request follows:
 
 ```text
-Route -> Service -> Repository -> data/restaurants.json
+Frontend
+   -> FastAPI Route
+   -> Service
+   -> Repository
+   -> JSON data
 ```
 
-Routes handle HTTP concerns, services contain business logic, repositories read
-the data source, and Pydantic schemas define the API response.
+For example, selecting a restaurant in the frontend calls
+`GET /restaurants/{restaurant_id}` and
+`GET /restaurants/{restaurant_id}/menu`.
 
-## Clean-setup check
+The route handles HTTP concerns, the service contains business logic, the
+repository reads/writes persistent data, and Pydantic models define the API
+contract.
 
-Before creating the submission tag, a team member who did not write this README
-should perform these steps from a fresh clone:
+## M1 submission checklist
 
-1. Create and activate a new virtual environment.
-2. Install `requirements.txt`.
-3. Run `python -m pytest`.
-4. Start the server with `python -m uvicorn app.main:app`.
-5. Visit `/health`, `/restaurants`, and `/docs`.
+Before creating the immutable `m1-vertical-slice` tag:
+
+1. Run `python -m pytest -v`.
+2. Start the application and test `/health`, `/restaurants`, `/docs`, and the
+   frontend.
+3. Verify the frontend can retrieve restaurants and menus from the API.
+4. Verify the management form against the team's management endpoints.
+5. Ensure every implementation feature is linked to a GitHub issue.
+6. Ensure merged code was reviewed through a pull request.
+7. Update `PROVENANCE.md` and the Decision Receipt.
+8. Update all scrum notes.
+9. Create the `m1-vertical-slice` tag only after the final submission commit.
+10. Record the full commit SHA in the Canvas PDF.
 
 Do not commit secrets, credentials, environment files, or access tokens.

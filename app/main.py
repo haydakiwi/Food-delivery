@@ -9,8 +9,7 @@ app = FastAPI(
 )
 
 app.include_router(restaurants_router)
-app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
-
+app.mount("/frontend", StaticFiles(directory="frontend", html=True), name="frontend")
 
 @app.get("/health", summary="Health check")
 def health() -> dict[str, str]:

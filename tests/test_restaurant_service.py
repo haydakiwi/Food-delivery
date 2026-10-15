@@ -1,9 +1,10 @@
 import pytest
 
 from app.schemas.menu import Menu
-from app.schemas.menu_item import MenuItem
-from app.schemas.restaurant import Restaurant
+from app.schemas.menu_item import MenuItem, MenuItemCreate, MenuItemUpdate
+from app.schemas.restaurant import Restaurant, RestaurantCreate, RestaurantUpdate
 from app.services.restaurant_service import (
+    DuplicateRestaurantNameError,
     MenuItemNotFoundError,
     RestaurantNotFoundError,
     RestaurantService,
@@ -48,6 +49,23 @@ class FakeRestaurantRepository:
             None,
         )
 
+    def create(self, restaurant_data):
+        new_restaurant = {
+            **restaurant_data,
+            "id": "rest_003",
+        }
+        self.restaurants.append(new_restaurant)
+        return new_restaurant
+
+    def update(self, restaurant_id, changes):
+        restaurant = self.get_by_id(restaurant_id)
+
+        if restaurant is None:
+            return None
+
+        restaurant.update(changes)
+        return restaurant
+
 
 class FakeMenuItemRepository:
     def __init__(self) -> None:
@@ -79,6 +97,24 @@ class FakeMenuItemRepository:
 
     def get_by_id(self, item_id: str):
         return next((item for item in self.items if item["id"] == item_id), None)
+
+    def create(self, restaurant_id, item_data):
+        new_item = {
+            **item_data,
+            "id": "item_003",
+            "restaurant_id": restaurant_id,
+        }
+        self.items.append(new_item)
+        return new_item
+
+    def update(self, item_id, changes):
+        item = self.get_by_id(item_id)
+
+        if item is None:
+            return None
+
+        item.update(changes)
+        return item
 
 
 @pytest.fixture
@@ -141,3 +177,132 @@ def test_get_menu_item_rejects_an_item_from_another_restaurant(
 ) -> None:
     with pytest.raises(MenuItemNotFoundError):
         service.get_menu_item("rest_001", "item_002")
+
+
+def test_create_restaurant(service: RestaurantService) -> None:
+    data = RestaurantCreate(
+        name="Pizza Place",
+        cuisine="Italian",
+        rating=4.4,
+        delivery_time_minutes=35,
+        delivery_fee=2.99,
+        is_open=True,
+        address="789 Test Road",
+    )
+
+    restaurant = service.create_restaurant(data)
+
+    assert isinstance(restaurant, Restaurant)
+    assert restaurant.id == "rest_003"
+    assert restaurant.name == "Pizza Place"
+
+
+def test_create_restaurant_rejects_duplicate_name(
+    service: RestaurantService,
+) -> None:
+    data = RestaurantCreate(
+        name="  TEST SUSHI  ",
+        cuisine="Japanese",
+        rating=4.5,
+        delivery_time_minutes=30,
+        delivery_fee=2.99,
+        is_open=True,
+        address="789 Test Road",
+    )
+
+    with pytest.raises(DuplicateRestaurantNameError):
+        service.create_restaurant(data)
+
+
+def test_update_restaurant_changes_selected_fields(
+    service: RestaurantService,
+) -> None:
+    restaurant = service.update_restaurant(
+        "rest_001",
+        RestaurantUpdate(
+            name="Updated Sushi",
+            delivery_fee=4.99,
+        ),
+    )
+
+    assert restaurant.name == "Updated Sushi"
+    assert restaurant.delivery_fee == 4.99
+    assert restaurant.cuisine == "Japanese"
+
+
+def test_update_unknown_restaurant_raises(
+    service: RestaurantService,
+) -> None:
+    with pytest.raises(RestaurantNotFoundError):
+        service.update_restaurant(
+            "rest_404",
+            RestaurantUpdate(name="Ghost"),
+        )
+
+
+def test_update_restaurant_rejects_duplicate_name(
+    service: RestaurantService,
+) -> None:
+    with pytest.raises(DuplicateRestaurantNameError):
+        service.update_restaurant(
+            "rest_001",
+            RestaurantUpdate(name="curry house"),
+        )
+
+
+def test_create_menu_item(service: RestaurantService) -> None:
+    item = service.create_menu_item(
+        "rest_001",
+        MenuItemCreate(
+            name="Miso Soup",
+            description="Traditional soup",
+            price=4.99,
+            category="Sides",
+            is_available=True,
+        ),
+    )
+
+    assert isinstance(item, MenuItem)
+    assert item.id == "item_003"
+    assert item.restaurant_id == "rest_001"
+    assert item.name == "Miso Soup"
+
+
+def test_create_menu_item_rejects_unknown_restaurant(
+    service: RestaurantService,
+) -> None:
+    with pytest.raises(RestaurantNotFoundError):
+        service.create_menu_item(
+            "rest_404",
+            MenuItemCreate(
+                name="Ghost Item",
+                price=5.99,
+                category="Mains",
+            ),
+        )
+
+
+def test_update_menu_item(service: RestaurantService) -> None:
+    item = service.update_menu_item(
+        "rest_001",
+        "item_001",
+        MenuItemUpdate(
+            price=12.99,
+            is_available=False,
+        ),
+    )
+
+    assert item.price == 12.99
+    assert item.is_available is False
+    assert item.name == "Salmon Roll"
+
+
+def test_update_menu_item_rejects_wrong_restaurant(
+    service: RestaurantService,
+) -> None:
+    with pytest.raises(MenuItemNotFoundError):
+        service.update_menu_item(
+            "rest_001",
+            "item_002",
+            MenuItemUpdate(price=20.00),
+        )

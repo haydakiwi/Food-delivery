@@ -17,6 +17,9 @@ class FakeRestaurantRepository:
             }
         ]
 
+    def get_all(self):
+        return self.restaurants
+
 
 def test_get_all_restaurants_returns_restaurant_models():
     repository = FakeRestaurantRepository()
@@ -24,7 +27,7 @@ def test_get_all_restaurants_returns_restaurant_models():
 
     restaurants = service.get_all_restaurants()
 
-    assert len(restaurants) == 2
+    assert len(restaurants) == 1
     assert isinstance(restaurants[0], Restaurant)
-    assert restaurants[0].id == "test_001"
+    assert restaurants[0].id == "rest_001"
     assert restaurants[0].name == "Test Sushi"

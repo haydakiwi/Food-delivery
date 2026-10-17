@@ -168,7 +168,7 @@ async function saveRestaurant(event) {
 
   try {
     const path = id ? `/restaurants/${encodeURIComponent(id)}` : "/restaurants";
-    const method = id ? "PUT" : "POST";
+    const method = id ? "PATCH" : "POST";
     await api(path, {
       method,
       body: JSON.stringify(payload),

@@ -48,14 +48,14 @@ http://127.0.0.1:8000/docs
 
 ## Customer API
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/health` | Confirm that the application is running |
-| GET | `/restaurants` | List restaurants |
-| GET | `/restaurants/{restaurant_id}` | Get restaurant details |
-| GET | `/restaurants/{restaurant_id}/menu` | Get a restaurant menu |
-| GET | `/restaurants/{restaurant_id}/menu/items/{item_id}` | Get one menu item |
-| GET | `/docs` | Generated Swagger/OpenAPI documentation |
+| Method | Path                                                | Purpose                                 |
+| ------ | --------------------------------------------------- | --------------------------------------- |
+| GET    | `/health`                                           | Confirm that the application is running |
+| GET    | `/restaurants`                                      | List restaurants                        |
+| GET    | `/restaurants/{restaurant_id}`                      | Get restaurant details                  |
+| GET    | `/restaurants/{restaurant_id}/menu`                 | Get a restaurant menu                   |
+| GET    | `/restaurants/{restaurant_id}/menu/items/{item_id}` | Get one menu item                       |
+| GET    | `/docs`                                             | Generated Swagger/OpenAPI documentation |
 
 The restaurant list supports:
 
@@ -84,7 +84,7 @@ endpoints:
 
 ```text
 POST /restaurants
-PUT  /restaurants/{restaurant_id}
+PATCH  /restaurants/{restaurant_id}
 ```
 
 The request body contains the restaurant fields:

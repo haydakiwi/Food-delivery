@@ -1,3 +1,4 @@
+from typing import Any
 from app.repositories.json_repository import JsonRepository, RepositoryDataError
 
 class RestaurantDataError(RepositoryDataError):
@@ -8,7 +9,7 @@ class RestaurantRepository(JsonRepository):
     id_prefix = "rest"
     error_class = RestaurantDataError
 
-    def create(self, restaurant_data): 
+    def create(self, restaurant_data: dict[str, Any]) -> dict[str, Any]:
         return self._insert(restaurant_data)
     
     def update(self, restaurant_id: str, changes: dict[str, Any]) -> dict[str, Any] | None:

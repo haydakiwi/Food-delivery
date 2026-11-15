@@ -1,0 +1,50 @@
+[
+    {
+        "id": "cust_001",
+        "name": "Alice Chen",
+        "email": "alice@example.com",
+        "phone": "604-555-0101",
+        "password_hash": "pbkdf2_sha256$100000$636f6d6d6974637265772d73656564$fda0031df3840574f01d5d5266be3371fac0e726b3ab7c6de37fab94c03492a5",
+        "role": "customer",
+        "is_active": true,
+        "addresses": [
+            {"label": "Home", "street": "1000 Davie St", "city": "Vancouver", "province": "BC", "postal_code": "V6E 1M3", "is_default": true}
+        ],
+        "created_at": "2026-11-01T18:00:00+00:00"
+    },
+    {
+        "id": "cust_002",
+        "name": "Ben Singh",
+        "email": "ben@example.com",
+        "phone": "604-555-0102",
+        "password_hash": "pbkdf2_sha256$100000$636f6d6d6974637265772d73656564$fda0031df3840574f01d5d5266be3371fac0e726b3ab7c6de37fab94c03492a5",
+        "role": "customer",
+        "is_active": true,
+        "addresses": [
+            {"label": "Home", "street": "2200 Main St", "city": "Vancouver", "province": "BC", "postal_code": "V5T 3C9", "is_default": true}
+        ],
+        "created_at": "2026-11-02T18:00:00+00:00"
+    },
+    {
+        "id": "cust_003",
+        "name": "Carla Diaz",
+        "email": "carla@example.com",
+        "phone": null,
+        "password_hash": "pbkdf2_sha256$100000$636f6d6d6974637265772d73656564$fda0031df3840574f01d5d5266be3371fac0e726b3ab7c6de37fab94c03492a5",
+        "role": "customer",
+        "is_active": false,
+        "addresses": [],
+        "created_at": "2026-11-03T18:00:00+00:00"
+    },
+    {
+        "id": "cust_004",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "phone": null,
+        "password_hash": "pbkdf2_sha256$100000$636f6d6d6974637265772d73656564$fda0031df3840574f01d5d5266be3371fac0e726b3ab7c6de37fab94c03492a5",
+        "role": "admin",
+        "is_active": true,
+        "addresses": [],
+        "created_at": "2026-11-01T17:00:00+00:00"
+    }
+]

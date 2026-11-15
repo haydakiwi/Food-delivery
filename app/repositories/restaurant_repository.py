@@ -1,4 +1,5 @@
 from typing import Any
+
 from app.repositories.json_repository import JsonRepository, RepositoryDataError
 
 class RestaurantDataError(RepositoryDataError):

@@ -1,0 +1,26 @@
+[
+    {
+        "id": "cart_001",
+        "customer_id": "cust_001",
+        "restaurant_id": "rest_001",
+        "items": [
+            {"menu_item_id": "item_001", "quantity": 2},
+            {"menu_item_id": "item_002", "quantity": 1}
+        ],
+        "status": "active",
+        "created_at": "2026-11-10T19:00:00+00:00",
+        "updated_at": "2026-11-10T19:05:00+00:00"
+    },
+    {
+        "id": "cart_002",
+        "customer_id": "cust_002",
+        "restaurant_id": "rest_002",
+        "items": [
+            {"menu_item_id": "item_003", "quantity": 1},
+            {"menu_item_id": "item_004", "quantity": 2}
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-09T01:00:00+00:00",
+        "updated_at": "2026-11-09T01:10:00+00:00"
+    }
+]

@@ -45,3 +45,17 @@
 - **Influence:** AI guidance assisted with the restaurant frontend interface, API requests between the frontend and backend, restaurant and menu display, restaurant create/update functionality, frontend styling, serving the frontend through FastAPI, GitHub Actions CI configuration, README documentation, and the Milestone 1 Decision Receipt. I reviewed and understood the implementation, tested the integrated application, and made the final implementation decisions.
 - **Validation:** Ran the automated pytest suite and verified all 77 tests passed. Verified the `/health`, restaurant filtering, menu retrieval, `/frontend/`, and `/docs` endpoints, checked the frontend JavaScript, and tested frontend-to-backend integration. An integration issue where the frontend used `PUT` while the backend update endpoint required `PATCH` was corrected and revalidated. The final merged `main` passed the complete automated test suite and GitHub CI checks.
 - **PR or commit:** Role D Milestone 1 implementation commits and subsequent frontend `PATCH` integration-fix PR.
+
+
+Milestone #2
+
+## Entry — M2 Member 1 (Data Models, Repositories and Persistence)
+
+- **Student(s):** Janhvi
+- **Artifact:** `app/repositories/json_repository.py`, `app/repositories/restaurant_repository.py`, `app/repositories/menu_item_repository.py`, `app/schemas/customer.py`, `app/schemas/cart.py`, `app/schemas/order.py`, `app/repositories/customer_repository.py`, `app/repositories/cart_repository.py`, `app/repositories/order_repository.py`, `app/repositories/integrity.py`, `app/core/config.py`, `data/customers.json`, `data/carts.json`, `data/orders.json`, `tests/test_customer_repository.py`, `tests/test_cart_repository.py`, `tests/test_order_repository.py`, and `tests/test_persistence_integration.py`
+- **Label:** AI-ASSISTED
+- **AI tool:** Claude
+- **Purpose:** Used AI to plan the Milestone 2 data-layer work, split it into GitHub Issues, guide the shared repository refactor, help learn about the Customer, Cart and Order models, repositories, seed data and tests, and diagnose test and CI failures.
+- **Influence:** For the JsonRepository refactor (Issue 1), I worked through it with AI guidance: AI explained what to move into the base class, and I updated the restaurant and menu item repositories; AI identified fixes for missing `return` statements and a missing `typing` import that only failed CI on Python 3.11/3.12. For Issues 2–4, AI taught how to write the Customer, Cart and Order models and repositories, the cross-file integrity check, the seed data and the repository and integration tests. I wrote the code in the project, ran the tests, reviewed the design decisions (cart stores item references not prices, orders store a price snapshot, orders are append-only, one active cart per customer, deactivated customers are kept rather than deleted), and coordinated the repository interfaces with Shukan and Jay.
+- **Validation:** Ran the full pytest suite locally and through GitHub Actions CI. The original 77 M1 tests pass unchanged after the refactor, and the full suite passes with 147 tests on the final branch. Verified stable IDs, persistence across repository restarts, rejection of duplicate emails, invalid quantities, second active carts and inconsistent order totals without modifying the data file, validity of committed seed data, and cross-file relationship integrity in an integrated Customer → Menu → Cart → Order test with a simulated restart.
+- **PR or commit:** PR #24 (JsonRepository refactor), PR #21 (Customer), PR #22 (Cart), PR #23 (Order).

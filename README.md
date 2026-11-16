@@ -2,10 +2,10 @@
 
 Team: **Food Delivery**
 
-Milestone 1 implements an integrated restaurant-discovery and menu-browsing
-vertical slice using the required **Route -> Service -> Repository -> JSON**
-architecture. A small browser frontend consumes the REST API for customer
-browsing and restaurant create/update operations.
+The project uses the required **Route -> Service -> Repository -> JSON**
+architecture. Milestone 1 provides restaurant discovery and menu browsing.
+Milestone 2 adds customer accounts, authentication, and authorization while
+preserving the same layered design.
 
 ## Requirements
 
@@ -56,6 +56,27 @@ http://127.0.0.1:8000/docs
 | GET    | `/restaurants/{restaurant_id}/menu`                 | Get a restaurant menu                   |
 | GET    | `/restaurants/{restaurant_id}/menu/items/{item_id}` | Get one menu item                       |
 | GET    | `/docs`                                             | Generated Swagger/OpenAPI documentation |
+
+## Customer accounts and authentication
+
+| Method | Path                             | Purpose                                  |
+| ------ | -------------------------------- | ---------------------------------------- |
+| POST   | `/customers/register`            | Register a customer                      |
+| POST   | `/auth/login`                    | Sign in and receive a bearer token       |
+| GET    | `/customers/me`                  | Get the signed-in customer's profile     |
+| PATCH  | `/customers/me`                  | Update profile and delivery addresses    |
+| POST   | `/customers/me/deactivate`       | Deactivate the signed-in account         |
+| GET    | `/customers/{customer_id}`       | Get a customer (administrator role only) |
+
+Passwords are salted and hashed with PBKDF2-SHA256 before crossing the
+repository boundary. API responses use the public customer schema and never
+return a password hash. Protected operations require
+`Authorization: Bearer <access_token>`; invalid or missing authentication
+returns HTTP 401, while inactive accounts and insufficient roles return HTTP
+403.
+
+The seed customers use the password `Password123!`. `cust_003` is intentionally
+inactive for demonstrating the deactivated-account rule.
 
 The restaurant list supports:
 
@@ -109,11 +130,20 @@ Committed data lives in:
 
 - `data/restaurants.json`
 - `data/menu_items.json`
+- `data/customers.json`
+- `data/carts.json`
+- `data/orders.json`
 
 The application paths can be overridden with:
 
 - `DATA_PATH`
 - `MENU_ITEMS_PATH`
+- `CUSTOMERS_PATH`
+- `CARTS_PATH`
+- `ORDERS_PATH`
+- `AUTH_SECRET` — set this to a private random value outside local development
+- `AUTH_TOKEN_TTL_SECONDS` — bearer-token lifetime (default: 3600 seconds)
+- `PASSWORD_HASH_ITERATIONS` — PBKDF2 work factor (default: 100000)
 
 Tests use temporary files and do not modify committed application data.
 

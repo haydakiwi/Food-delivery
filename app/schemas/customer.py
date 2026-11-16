@@ -63,6 +63,11 @@ class CustomerCreate(BaseModel):
     phone: str | None = None
     addresses: list[DeliveryAddress] = Field(default_factory=list)
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def _normalize(cls, value: object) -> object:
+        return normalize_email(value) if isinstance(value, str) else value
+
 
 class CustomerUpdate(BaseModel):
     """Fields a customer may change on their own account."""
@@ -71,3 +76,8 @@ class CustomerUpdate(BaseModel):
     email: str | None = Field(default=None, pattern=EMAIL_PATTERN)
     phone: str | None = None
     addresses: list[DeliveryAddress] | None = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def _normalize(cls, value: object) -> object:
+        return normalize_email(value) if isinstance(value, str) else value

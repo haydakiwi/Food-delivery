@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import hmac
 import json
 from pathlib import Path
 
@@ -79,6 +82,20 @@ def test_token_tampering_and_expiration_are_rejected(auth_repository):
     now[0] = 110.0
     with pytest.raises(InvalidTokenError):
         auth.resolve_token(token)
+
+
+def test_token_rejects_invalid_base64_even_with_matching_signature(auth_repository):
+    auth = AuthService(auth_repository, "secret", clock=lambda: 100.0)
+    token = auth.login("alice@example.com", "Password123!").access_token
+    encoded_payload, _signature = token.split(".", 1)
+    malformed_payload = encoded_payload + "%"
+    signature = hmac.new(
+        b"secret", malformed_payload.encode("ascii"), hashlib.sha256
+    ).digest()
+    encoded_signature = base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
+
+    with pytest.raises(InvalidTokenError):
+        auth.resolve_token(f"{malformed_payload}.{encoded_signature}")
 
 
 def test_deactivation_immediately_invalidates_existing_token(auth_repository):

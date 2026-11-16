@@ -167,6 +167,32 @@ def test_update_to_taken_email_returns_409(customer_client: TestClient):
     assert response.status_code == 409
 
 
+@pytest.mark.parametrize(
+    "invalid_update",
+    [
+        {"name": None},
+        {"email": None},
+        {"addresses": None},
+    ],
+)
+def test_explicit_null_update_returns_422_without_changing_data(
+    customer_client: TestClient,
+    customers_data_file: Path,
+    invalid_update: dict[str, None],
+):
+    token = _login(customer_client)
+    before = customers_data_file.read_text(encoding="utf-8")
+
+    response = customer_client.patch(
+        "/customers/me",
+        headers=_authorization(token),
+        json=invalid_update,
+    )
+
+    assert response.status_code == 422
+    assert customers_data_file.read_text(encoding="utf-8") == before
+
+
 def test_admin_lookup_enforces_role_and_returns_public_customer(
     customer_client: TestClient,
 ):

@@ -61,7 +61,7 @@ def _base64url_encode(value: bytes) -> str:
 
 def _base64url_decode(value: str) -> bytes:
     padding = "=" * (-len(value) % 4)
-    return base64.urlsafe_b64decode(value + padding)
+    return base64.b64decode(value + padding, altchars=b"-_", validate=True)
 
 
 class AuthService:

@@ -142,11 +142,17 @@ def client_factory(
     clients: list[TestClient] = []
 
     def build_client(
-        data_path: Path, menu_items_path: Path | None = None
+        data_path: Path,
+        menu_items_path: Path | None = None,
+        customers_path: Path | None = None,
     ) -> TestClient:
         monkeypatch.setenv("DATA_PATH", str(data_path))
         if menu_items_path is not None:
             monkeypatch.setenv("MENU_ITEMS_PATH", str(menu_items_path))
+        if customers_path is not None:
+            monkeypatch.setenv("CUSTOMERS_PATH", str(customers_path))
+        monkeypatch.setenv("AUTH_SECRET", "test-only-auth-secret")
+        monkeypatch.setenv("AUTH_TOKEN_TTL_SECONDS", "3600")
         _clear_application_modules()
 
         config = importlib.import_module("app.core.config")
@@ -154,6 +160,10 @@ def client_factory(
         if menu_items_path is not None:
             monkeypatch.setattr(
                 config, "MENU_ITEMS_PATH", str(menu_items_path), raising=False
+            )
+        if customers_path is not None:
+            monkeypatch.setattr(
+                config, "CUSTOMERS_PATH", str(customers_path), raising=False
             )
 
         application = importlib.import_module("app.main").app

@@ -63,11 +63,23 @@ class CustomerCreate(BaseModel):
     phone: str | None = None
     addresses: list[DeliveryAddress] = Field(default_factory=list)
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def _normalize(cls, value: object) -> object:
+        return normalize_email(value) if isinstance(value, str) else value
+
 
 class CustomerUpdate(BaseModel):
     """Fields a customer may change on their own account."""
 
-    name: str | None = Field(default=None, min_length=1)
-    email: str | None = Field(default=None, pattern=EMAIL_PATTERN)
+    # These fields may be omitted, but an explicitly supplied null would corrupt
+    # the stored record because CustomerPublic requires non-null values.
+    name: str = Field(default=None, min_length=1)
+    email: str = Field(default=None, pattern=EMAIL_PATTERN)
     phone: str | None = None
-    addresses: list[DeliveryAddress] | None = None
+    addresses: list[DeliveryAddress] = Field(default=None)
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def _normalize(cls, value: object) -> object:
+        return normalize_email(value) if isinstance(value, str) else value

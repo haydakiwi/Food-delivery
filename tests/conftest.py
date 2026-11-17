@@ -145,25 +145,49 @@ def client_factory(
         data_path: Path,
         menu_items_path: Path | None = None,
         customers_path: Path | None = None,
+        carts_path: Path | None = None,
+        orders_path: Path | None = None,
     ) -> TestClient:
         monkeypatch.setenv("DATA_PATH", str(data_path))
+
         if menu_items_path is not None:
             monkeypatch.setenv("MENU_ITEMS_PATH", str(menu_items_path))
+
         if customers_path is not None:
             monkeypatch.setenv("CUSTOMERS_PATH", str(customers_path))
+
+        if carts_path is not None:
+            monkeypatch.setenv("CARTS_PATH", str(carts_path))
+
+        if orders_path is not None:
+            monkeypatch.setenv("ORDERS_PATH", str(orders_path))
+
         monkeypatch.setenv("AUTH_SECRET", "test-only-auth-secret")
         monkeypatch.setenv("AUTH_TOKEN_TTL_SECONDS", "3600")
         _clear_application_modules()
 
         config = importlib.import_module("app.core.config")
+
         monkeypatch.setattr(config, "DATA_PATH", str(data_path), raising=False)
+
         if menu_items_path is not None:
             monkeypatch.setattr(
                 config, "MENU_ITEMS_PATH", str(menu_items_path), raising=False
             )
+
         if customers_path is not None:
             monkeypatch.setattr(
                 config, "CUSTOMERS_PATH", str(customers_path), raising=False
+            )
+
+        if carts_path is not None:
+            monkeypatch.setattr(
+                config, "CARTS_PATH", str(carts_path), raising=False
+            )
+
+        if orders_path is not None:
+            monkeypatch.setattr(
+                config, "ORDERS_PATH", str(orders_path), raising=False
             )
 
         application = importlib.import_module("app.main").app

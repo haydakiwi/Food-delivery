@@ -78,6 +78,36 @@ returns HTTP 401, while inactive accounts and insufficient roles return HTTP
 The seed customers use the password `Password123!`. `cust_003` is intentionally
 inactive for demonstrating the deactivated-account rule.
 
+## Cart, checkout, and orders
+
+All cart, checkout, and order endpoints require an authenticated customer
+bearer token using `Authorization: Bearer <access_token>`.
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| GET | `/carts` | Retrieve the signed-in customer's active cart |
+| POST | `/carts` | Create an empty active cart |
+| POST | `/carts/items` | Add a menu item to the active cart |
+| PATCH | `/carts/items/{menu_item_id}` | Update the quantity of a cart item |
+| DELETE | `/carts/items/{menu_item_id}` | Remove an item from the cart |
+| DELETE | `/carts/items` | Clear the active cart |
+| POST | `/checkout` | Create an order from the active cart |
+| GET | `/orders` | Retrieve the signed-in customer's order history |
+
+Cart operations enforce business rules, including allowing items from only
+one restaurant per cart, checking menu-item availability, and limiting item
+quantities to 50.
+
+Checkout validates the cart and calculates item prices and delivery fees using
+current server-side data. A delivery address may optionally be supplied in the
+checkout request.
+
+Orders are associated with the customer who placed them. Customers can only
+retrieve their own order history, which is returned newest first.
+
+In M2, newly created orders have the status `placed`. The full order-status
+lifecycle is deferred to M3.
+
 The restaurant list supports:
 
 - `search` — case-insensitive restaurant-name search

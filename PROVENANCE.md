@@ -59,3 +59,14 @@ Milestone #2
 - **Influence:** For the JsonRepository refactor (Issue 1), I worked through it with AI guidance: AI explained what to move into the base class, and I updated the restaurant and menu item repositories; AI identified fixes for missing `return` statements and a missing `typing` import that only failed CI on Python 3.11/3.12. For Issues 2–4, AI taught how to write the Customer, Cart and Order models and repositories, the cross-file integrity check, the seed data and the repository and integration tests. I wrote the code in the project, ran the tests, reviewed the design decisions (cart stores item references not prices, orders store a price snapshot, orders are append-only, one active cart per customer, deactivated customers are kept rather than deleted), and coordinated the repository interfaces with Shukan and Jay.
 - **Validation:** Ran the full pytest suite locally and through GitHub Actions CI. The original 77 M1 tests pass unchanged after the refactor, and the full suite passes with 147 tests on the final branch. Verified stable IDs, persistence across repository restarts, rejection of duplicate emails, invalid quantities, second active carts and inconsistent order totals without modifying the data file, validity of committed seed data, and cross-file relationship integrity in an integrated Customer → Menu → Cart → Order test with a simulated restart.
 - **PR or commit:** PR #24 (JsonRepository refactor), PR #25 (Customer), PR #26 (Cart), PR #27 (Order).
+
+## Entry — M2 Member 3 (Cart, Checkout, and Order APIs)
+
+- **Student(s):** Jay
+- **Artifact:** `app/api/routes/carts.py`, `app/api/routes/checkout.py`, `app/api/routes/orders.py`, `app/services/cart_service.py`, `app/services/checkout_service.py`, `app/main.py`, `tests/conftest.py`, `tests/test_carts.py`, `tests/test_cart_service.py`, `tests/test_checkout.py`, and `tests/test_checkout_service.py`
+- **Label:** AI-ASSISTED
+- **AI tool:** ChatGPT
+- **Purpose:** Used ChatGPT to help interpret the Cart, Checkout, and Order API requirements, plan the implementation, review the route and service-layer design, testing issues and assist with Git/GitHub workflow.
+- **Influence:** AI guidance assisted with implementing authenticated cart operations, cart validation and business rules, checkout validation and order creation, customer-specific order retrieval, API error handling, and automated test coverage. I reviewed/understood then made final implementation decisions, and performed the integration and testing.
+- **Validation:** Ran the complete automated pytest suite and verified that all 236 tests passed. Tests covered cart operations, authentication and authorization, cart business rules, checkout validation, order creation, persistence, and customer-specific order retrieval.
+- **PR or commit:** PR #30 — Implement Cart, Checkout, and Order APIs.

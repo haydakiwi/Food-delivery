@@ -211,7 +211,77 @@ $("close-details").addEventListener("click", () => {
   $("details-panel").classList.add("hidden");
 });
 
+//login function
+async function login() {
+  try {
+    const result = await api("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: $("login-email").value,
+        password: $("login-password").value
+      })
+    });
+
+    localStorage.setItem(
+      "token",
+      result.access_token
+    );
+
+    localStorage.setItem(
+      "customer",
+      JSON.stringify(result.customer)
+    );
+
+    $("login-status").textContent =
+      "Login successful";
+
+  } catch (error) {
+
+    $("login-status").textContent =
+      error.message;
+  }
+}
+
+async function registerCustomer() {
+  try {
+
+    await api("/customers/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: $("register-name").value,
+        email: $("register-email").value,
+        password: $("register-password").value,
+        phone: "1234567890",
+        addresses: [
+          {
+            label: "Home",
+            street: "123 Test Street",
+            city: "Kelowna",
+            province: "BC",
+            postal_code: "V1V1V1",
+            is_default: true
+          }
+        ]
+      })
+    });
+
+    $("register-status").textContent =
+      "Registration successful";
+
+  } catch(error) {
+
+    $("register-status").textContent =
+      error.message;
+  }
+}
+
 $("restaurant-form").addEventListener("submit", saveRestaurant);
 $("reset-form").addEventListener("click", resetForm);
+$("login-btn").addEventListener("click", login);
+
+$("register-btn").addEventListener(
+  "click",
+  registerCustomer
+);
 
 loadRestaurants();

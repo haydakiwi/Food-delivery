@@ -260,6 +260,20 @@ $("close-details").addEventListener("click", () => {
 });
 
 async function registerCustomer() {
+  if (
+    !$("register-name").value.trim() ||
+    !$("register-email").value.trim() ||
+    !$("register-password").value.trim() ||
+    !$("register-phone").value.trim() ||
+    !$("register-street").value.trim() ||
+    !$("register-city").value.trim() ||
+    !$("register-province").value.trim() ||
+    !$("register-postal").value.trim()
+  ) {
+    $("register-status").textContent = "Please fill in all fields.";
+    return;
+  }
+
   try {
     await api("/customers/register", {
       method: "POST",
@@ -347,7 +361,7 @@ async function loadCart() {
       .map(
         (item) => `
           <div class="menu-item">
-            <strong>${item.menu_item_id}</strong><br>
+            <strong>${escapeHtml(item.menu_item_id)}</strong><br>
             Quantity: ${item.quantity}
           </div>
         `,

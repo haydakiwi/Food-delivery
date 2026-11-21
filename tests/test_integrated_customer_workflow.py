@@ -124,6 +124,7 @@ def test_customer_to_order_workflow(
     assert menu.json()["items"]
 
     menu_item = menu.json()["items"][0]
+    expected_item_id = menu_item["id"]
 
     add_to_cart = workflow_client.post(
         "/carts/items",
@@ -148,6 +149,9 @@ def test_customer_to_order_workflow(
     assert cart_data["items"]
     assert len(cart_data["items"]) == 1
 
+    expected_total = cart_data["total"]
+    customer_id = registration.json()["id"]
+
     checkout = workflow_client.post(
         "/checkout",
         headers=headers,
@@ -160,6 +164,9 @@ def test_customer_to_order_workflow(
     assert order["id"]
     assert order["items"]
     assert order["total"] > 0
+
+    assert order["customer_id"] == customer_id
+    assert order["total"] == expected_total
 
     orders = workflow_client.get(
         "/orders",
@@ -183,6 +190,11 @@ def test_customer_to_order_workflow(
 
     assert matching_order["items"]
     assert matching_order["total"] == order["total"]
+
+    first_item = matching_order["items"][0]
+
+    assert first_item["menu_item_id"] == expected_item_id
+    assert first_item["quantity"] == 1
 
     cart_after_checkout = workflow_client.get(
         "/carts",

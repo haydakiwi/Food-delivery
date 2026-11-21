@@ -6,14 +6,121 @@
         "restaurant_name": "Burger Palace",
         "cart_id": "cart_002",
         "items": [
-            {"menu_item_id": "item_003", "name": "Classic Cheeseburger", "unit_price": 12.99, "quantity": 1, "line_total": 12.99},
-            {"menu_item_id": "item_004", "name": "Fries", "unit_price": 4.99, "quantity": 2, "line_total": 9.98}
+            {
+                "menu_item_id": "item_003",
+                "name": "Classic Cheeseburger",
+                "unit_price": 12.99,
+                "quantity": 1,
+                "line_total": 12.99
+            },
+            {
+                "menu_item_id": "item_004",
+                "name": "Fries",
+                "unit_price": 4.99,
+                "quantity": 2,
+                "line_total": 9.98
+            }
         ],
         "subtotal": 22.97,
         "delivery_fee": 1.99,
         "total": 24.96,
-        "delivery_address": {"label": "Home", "street": "2200 Main St", "city": "Vancouver", "province": "BC", "postal_code": "V5T 3C9", "is_default": true},
+        "delivery_address": {
+            "label": "Home",
+            "street": "2200 Main St",
+            "city": "Vancouver",
+            "province": "BC",
+            "postal_code": "V5T 3C9",
+            "is_default": true
+        },
         "status": "placed",
         "created_at": "2026-11-09T01:10:00+00:00"
+    },
+    {
+        "customer_id": "cust_005",
+        "restaurant_id": "rest_001",
+        "restaurant_name": "Sakura Sushi House",
+        "cart_id": "cart_003",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "name": "Salmon Nigiri",
+                "unit_price": 6.5,
+                "quantity": 1,
+                "line_total": 6.5
+            }
+        ],
+        "subtotal": 6.5,
+        "delivery_fee": 2.99,
+        "total": 9.49,
+        "delivery_address": null,
+        "status": "placed",
+        "created_at": "2026-11-21T06:16:50+00:00",
+        "id": "ord_002"
+    },
+    {
+        "customer_id": "cust_005",
+        "restaurant_id": "rest_001",
+        "restaurant_name": "Sakura Sushi House",
+        "cart_id": "cart_004",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "name": "Salmon Nigiri",
+                "unit_price": 6.5,
+                "quantity": 1,
+                "line_total": 6.5
+            }
+        ],
+        "subtotal": 6.5,
+        "delivery_fee": 2.99,
+        "total": 9.49,
+        "delivery_address": null,
+        "status": "placed",
+        "created_at": "2026-11-21T06:18:46+00:00",
+        "id": "ord_003"
+    },
+    {
+        "customer_id": "cust_007",
+        "restaurant_id": "rest_001",
+        "restaurant_name": "Sakura Sushi House",
+        "cart_id": "cart_005",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "name": "Salmon Nigiri",
+                "unit_price": 6.5,
+                "quantity": 1,
+                "line_total": 6.5
+            }
+        ],
+        "subtotal": 6.5,
+        "delivery_fee": 2.99,
+        "total": 9.49,
+        "delivery_address": null,
+        "status": "placed",
+        "created_at": "2026-11-21T06:21:08+00:00",
+        "id": "ord_004"
+    },
+    {
+        "customer_id": "cust_008",
+        "restaurant_id": "rest_001",
+        "restaurant_name": "Sakura Sushi House",
+        "cart_id": "cart_006",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "name": "Salmon Nigiri",
+                "unit_price": 6.5,
+                "quantity": 1,
+                "line_total": 6.5
+            }
+        ],
+        "subtotal": 6.5,
+        "delivery_fee": 2.99,
+        "total": 9.49,
+        "delivery_address": null,
+        "status": "placed",
+        "created_at": "2026-11-21T06:21:15+00:00",
+        "id": "ord_005"
     }
 ]

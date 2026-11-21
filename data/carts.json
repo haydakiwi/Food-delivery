@@ -4,8 +4,14 @@
         "customer_id": "cust_001",
         "restaurant_id": "rest_001",
         "items": [
-            {"menu_item_id": "item_001", "quantity": 2},
-            {"menu_item_id": "item_002", "quantity": 1}
+            {
+                "menu_item_id": "item_001",
+                "quantity": 2
+            },
+            {
+                "menu_item_id": "item_002",
+                "quantity": 1
+            }
         ],
         "status": "active",
         "created_at": "2026-11-10T19:00:00+00:00",
@@ -16,11 +22,73 @@
         "customer_id": "cust_002",
         "restaurant_id": "rest_002",
         "items": [
-            {"menu_item_id": "item_003", "quantity": 1},
-            {"menu_item_id": "item_004", "quantity": 2}
+            {
+                "menu_item_id": "item_003",
+                "quantity": 1
+            },
+            {
+                "menu_item_id": "item_004",
+                "quantity": 2
+            }
         ],
         "status": "checked_out",
         "created_at": "2026-11-09T01:00:00+00:00",
         "updated_at": "2026-11-09T01:10:00+00:00"
+    },
+    {
+        "customer_id": "cust_005",
+        "restaurant_id": "rest_001",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-21T06:16:50+00:00",
+        "updated_at": "2026-11-21T06:16:50+00:00",
+        "id": "cart_003"
+    },
+    {
+        "customer_id": "cust_005",
+        "restaurant_id": "rest_001",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-21T06:18:46+00:00",
+        "updated_at": "2026-11-21T06:18:47+00:00",
+        "id": "cart_004"
+    },
+    {
+        "customer_id": "cust_007",
+        "restaurant_id": "rest_001",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-21T06:21:08+00:00",
+        "updated_at": "2026-11-21T06:21:08+00:00",
+        "id": "cart_005"
+    },
+    {
+        "customer_id": "cust_008",
+        "restaurant_id": "rest_001",
+        "items": [
+            {
+                "menu_item_id": "item_001",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-21T06:21:15+00:00",
+        "updated_at": "2026-11-21T06:21:15+00:00",
+        "id": "cart_006"
     }
 ]

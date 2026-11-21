@@ -25,13 +25,7 @@
 
 ---
 
-## TODO (date) — Progress Check: Data Layer and Authentication
-
-### Discussion
-- Reviewed the shared `JsonRepository` refactor and the Customer, Cart, and
-  Order repositories.
-- Confirmed repository method names with the customer and cart/checkout work.
-- TODO: add anything else discussed.
+## November 16, 2026 — Progress Update: Data Layer and Authentication
 
 ### Work completed
 - Janhvi: shared `JsonRepository` base (PR #24), Customer (PR #25), Cart
@@ -45,13 +39,7 @@
 
 ---
 
-## TODO (date) — Progress Check: Cart, Checkout, Orders, Frontend
-
-### Discussion
-- Reviewed cart business rules and the checkout sequence (order saved before
-  the cart is closed).
-- Reviewed frontend integration with the real API.
-- TODO: add anything else discussed.
+## November 20, 2026 — Progress Update: Cart, Checkout, Orders, Frontend
 
 ### Work completed
 - Jay: cart service and API, checkout service, and order history (PR #30).
@@ -83,21 +71,7 @@
 - **Jay:** review the remaining pull requests and keep the Decision Receipt
   current.
 - **Shukan:** Project Board updates and a final documentation check.
-- TODO: confirm these match what the team agreed.
 
 ### Outcome
 - Agreed to merge the remaining work through reviewed pull requests, run the
   full test suite, and only then create the `m2-integrated-system` tag.
-
----
-
-## TODO (date) — Testing & Final Submission
-
-### Discussion
-- TODO: ran the full test suite on `main` (record the number of tests passed).
-- TODO: walked through the full workflow in the frontend and the demo
-  business-rule scenarios, including a restart.
-- TODO: checked the Project Board, Decision Receipt, provenance, and README.
-
-### Outcome
-- TODO: created the `m2-integrated-system` tag and recorded the commit SHA.

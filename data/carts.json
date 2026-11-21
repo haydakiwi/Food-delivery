@@ -4,8 +4,14 @@
         "customer_id": "cust_001",
         "restaurant_id": "rest_001",
         "items": [
-            {"menu_item_id": "item_001", "quantity": 2},
-            {"menu_item_id": "item_002", "quantity": 1}
+            {
+                "menu_item_id": "item_001",
+                "quantity": 2
+            },
+            {
+                "menu_item_id": "item_002",
+                "quantity": 1
+            }
         ],
         "status": "active",
         "created_at": "2026-11-10T19:00:00+00:00",
@@ -16,11 +22,109 @@
         "customer_id": "cust_002",
         "restaurant_id": "rest_002",
         "items": [
-            {"menu_item_id": "item_003", "quantity": 1},
-            {"menu_item_id": "item_004", "quantity": 2}
+            {
+                "menu_item_id": "item_003",
+                "quantity": 1
+            },
+            {
+                "menu_item_id": "item_004",
+                "quantity": 2
+            }
         ],
         "status": "checked_out",
         "created_at": "2026-11-09T01:00:00+00:00",
         "updated_at": "2026-11-09T01:10:00+00:00"
+    },
+    {
+        "customer_id": "cust_011",
+        "restaurant_id": "rest_002",
+        "items": [
+            {
+                "menu_item_id": "item_003",
+                "quantity": 2
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-19T01:12:10+00:00",
+        "updated_at": "2026-11-19T01:17:34+00:00",
+        "id": "cart_003"
+    },
+    {
+        "customer_id": "cust_011",
+        "restaurant_id": "rest_005",
+        "items": [
+            {
+                "menu_item_id": "item_009",
+                "quantity": 2
+            },
+            {
+                "menu_item_id": "item_010",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-19T01:25:57+00:00",
+        "updated_at": "2026-11-19T01:26:18+00:00",
+        "id": "cart_004"
+    },
+    {
+        "customer_id": "cust_011",
+        "restaurant_id": "rest_005",
+        "items": [
+            {
+                "menu_item_id": "item_010",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-19T01:28:55+00:00",
+        "updated_at": "2026-11-19T01:29:01+00:00",
+        "id": "cart_005"
+    },
+    {
+        "customer_id": "cust_011",
+        "restaurant_id": "rest_003",
+        "items": [
+            {
+                "menu_item_id": "item_005",
+                "quantity": 1
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-19T01:35:49+00:00",
+        "updated_at": "2026-11-19T01:36:08+00:00",
+        "id": "cart_006"
+    },
+    {
+        "customer_id": "cust_011",
+        "restaurant_id": "rest_004",
+        "items": [
+            {
+                "menu_item_id": "item_007",
+                "quantity": 8
+            }
+        ],
+        "status": "checked_out",
+        "created_at": "2026-11-19T01:36:47+00:00",
+        "updated_at": "2026-11-19T01:49:58+00:00",
+        "id": "cart_007"
+    },
+    {
+        "customer_id": "cust_011",
+        "restaurant_id": "rest_005",
+        "items": [
+            {
+                "menu_item_id": "item_010",
+                "quantity": 2
+            },
+            {
+                "menu_item_id": "item_009",
+                "quantity": 1
+            }
+        ],
+        "status": "active",
+        "created_at": "2026-11-19T01:59:37+00:00",
+        "updated_at": "2026-11-19T01:59:43+00:00",
+        "id": "cart_008"
     }
 ]

@@ -116,8 +116,11 @@ async function loadRestaurant(id) {
     ]);
 
     state.selectedRestaurant = restaurant;
+
     $("details-panel").classList.remove("hidden");
+
     $("restaurant-name").textContent = restaurant.name;
+
     $("restaurant-details").innerHTML = `
       <p><strong>Cuisine:</strong> ${escapeHtml(restaurant.cuisine)}</p>
       <p><strong>Rating:</strong> ${restaurant.rating.toFixed(1)}/5</p>
@@ -128,6 +131,7 @@ async function loadRestaurant(id) {
     `;
 
     const menuList = $("menu-list");
+
     menuList.replaceChildren();
 
     if (!menu.items.length) {
@@ -141,25 +145,32 @@ async function loadRestaurant(id) {
       element.className = "menu-item";
 
       element.innerHTML = `
-      <h4>${escapeHtml(item.name)} — $${item.price.toFixed(2)}</h4>
-      <p>${escapeHtml(item.description)}</p>
-      <p>${escapeHtml(item.category)} · ${item.is_available ? "Available" : "Unavailable"}</p>
-    `;
+        <h4>${escapeHtml(item.name)} — $${item.price.toFixed(2)}</h4>
+        <p>${escapeHtml(item.description)}</p>
+        <p>${escapeHtml(item.category)} · ${item.is_available ? "Available" : "Unavailable"}</p>
+      `;
 
       const addButton = document.createElement("button");
 
-      addButton.textContent = "Add To Cart";
+      if (!item.is_available) {
+        addButton.disabled = true;
+        addButton.textContent = "Unavailable";
+      } else {
+        addButton.textContent = "Add To Cart";
 
-      addButton.addEventListener("click", () => {
-        addToCart(item.id);
-      });
+        addButton.addEventListener("click", () => {
+          addToCart(item.id);
+        });
+      }
 
       element.appendChild(addButton);
 
       menuList.appendChild(element);
     });
 
-    $("details-panel").scrollIntoView({ behavior: "smooth" });
+    $("details-panel").scrollIntoView({
+      behavior: "smooth",
+    });
   } catch (error) {
     alert(`Could not load restaurant: ${error.message}`);
   }
@@ -256,14 +267,15 @@ async function registerCustomer() {
         name: $("register-name").value,
         email: $("register-email").value,
         password: $("register-password").value,
-        phone: "1234567890",
+        phone: $("register-phone").value,
+
         addresses: [
           {
             label: "Home",
-            street: "123 Test Street",
-            city: "Kelowna",
-            province: "BC",
-            postal_code: "V1V1V1",
+            street: $("register-street").value,
+            city: $("register-city").value,
+            province: $("register-province").value,
+            postal_code: $("register-postal").value,
             is_default: true,
           },
         ],
@@ -323,14 +335,22 @@ async function loadCart() {
       },
     });
 
+    if (!result) {
+      $("cart-items").textContent = "Your cart is empty.";
+
+      $("cart-total").textContent = "";
+
+      return;
+    }
+
     $("cart-items").innerHTML = result.items
       .map(
         (item) => `
-      <div class="menu-item">
-        <strong>${item.menu_item_id}</strong><br>
-        Quantity: ${item.quantity}
-      </div>
-    `,
+          <div class="menu-item">
+            <strong>${item.menu_item_id}</strong><br>
+            Quantity: ${item.quantity}
+          </div>
+        `,
       )
       .join("");
 
@@ -376,14 +396,14 @@ async function loadOrders() {
       .map(
         (order) => `
     <div class="panel">
-      <h3>${order.restaurant_name}</h3>
+      <h3>${escapeHtml(order.restaurant_name)}</h3>
 
       <p>
-        <strong>Order ID:</strong> ${order.id}
+        <strong>Order ID:</strong> ${escapeHtml(order.id)}
       </p>
 
       <p>
-        <strong>Status:</strong> ${order.status}
+        <strong>Status:</strong> ${escapeHtml(order.status)}
       </p>
 
       <p>
@@ -402,7 +422,7 @@ async function loadOrders() {
           .map(
             (item) => `
               <li>
-                ${item.name}
+                ${escapeHtml(item.name)}
                 × ${item.quantity}
                 ($${item.line_total})
               </li>

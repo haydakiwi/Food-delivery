@@ -18,7 +18,7 @@ from app.repositories.cart_repository import (
 from app.repositories.customer_repository import CustomerRepository
 from app.repositories.menu_item_repository import MenuItemRepository
 from app.repositories.restaurant_repository import RestaurantRepository
-from app.schemas.cart import Cart, CartItemAdd, CartItemQuantityUpdate
+from app.schemas.cart import CartResponse, CartItemAdd, CartItemQuantityUpdate
 from app.services.cart_service import (
     CartCustomerNotFoundError,
     CartItemNotFoundError,
@@ -27,6 +27,7 @@ from app.services.cart_service import (
     CartNotFoundError,
     CartQuantityLimitError,
     CartService,
+    CartRestaurantNotFoundError,
     DifferentRestaurantError,
     InactiveCartCustomerError,
 )
@@ -63,6 +64,7 @@ def _raise_cart_error(exc: Exception) -> None:
             CartCustomerNotFoundError,
             CartNotFoundError,
             CartMenuItemNotFoundError,
+            CartRestaurantNotFoundError,
             CartItemNotFoundError,
         ),
     ):
@@ -90,30 +92,32 @@ def _raise_cart_error(exc: Exception) -> None:
 
 @router.get(
     "",
-    response_model=Cart | None,
+    response_model=CartResponse | None,
     status_code=status.HTTP_200_OK,
     summary="Get active cart",
     description="Return the authenticated customer's active cart, if one exists.",
 )
-def get_cart(customer: CurrentCustomer) -> Cart | None:
+def get_cart(customer: CurrentCustomer) -> CartResponse | None:
     try:
         return service.get_active_cart(customer.id)
     except (
         CartCustomerNotFoundError,
         InactiveCartCustomerError,
+        CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
     ) as exc:
         _raise_cart_error(exc)
 
 
 @router.post(
     "",
-    response_model=Cart,
+    response_model=CartResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create cart",
     description="Create an empty active cart for the authenticated customer.",
     responses={409: {"description": "An active cart already exists"}},
 )
-def create_cart(customer: CurrentCustomer) -> Cart:
+def create_cart(customer: CurrentCustomer) -> CartResponse:
     try:
         return service.create_cart(customer.id)
     except (
@@ -126,7 +130,7 @@ def create_cart(customer: CurrentCustomer) -> Cart:
 
 @router.post(
     "/items",
-    response_model=Cart,
+    response_model=CartResponse,
     status_code=status.HTTP_200_OK,
     summary="Add item to cart",
     description=(
@@ -142,7 +146,7 @@ def create_cart(customer: CurrentCustomer) -> Cart:
 def add_cart_item(
     data: CartItemAdd,
     customer: CurrentCustomer,
-) -> Cart:
+) -> CartResponse:
     try:
         return service.add_item(
             customer.id,
@@ -153,6 +157,7 @@ def add_cart_item(
         CartCustomerNotFoundError,
         InactiveCartCustomerError,
         CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
         CartMenuItemUnavailableError,
         DifferentRestaurantError,
         CartQuantityLimitError,
@@ -163,7 +168,7 @@ def add_cart_item(
 
 @router.patch(
     "/items/{menu_item_id}",
-    response_model=Cart,
+    response_model=CartResponse,
     status_code=status.HTTP_200_OK,
     summary="Update cart item quantity",
     description="Set the quantity of an existing item in the active cart.",
@@ -177,7 +182,7 @@ def update_cart_item(
     menu_item_id: str,
     data: CartItemQuantityUpdate,
     customer: CurrentCustomer,
-) -> Cart:
+) -> CartResponse:
     try:
         return service.update_item_quantity(
             customer.id,
@@ -190,6 +195,7 @@ def update_cart_item(
         CartNotFoundError,
         CartItemNotFoundError,
         CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
         CartMenuItemUnavailableError,
         DifferentRestaurantError,
     ) as exc:
@@ -198,7 +204,7 @@ def update_cart_item(
 
 @router.delete(
     "/items/{menu_item_id}",
-    response_model=Cart,
+    response_model=CartResponse,
     status_code=status.HTTP_200_OK,
     summary="Remove cart item",
     description="Remove one item from the authenticated customer's active cart.",
@@ -207,7 +213,7 @@ def update_cart_item(
 def remove_cart_item(
     menu_item_id: str,
     customer: CurrentCustomer,
-) -> Cart:
+) -> CartResponse:
     try:
         return service.remove_item(customer.id, menu_item_id)
     except (
@@ -215,19 +221,21 @@ def remove_cart_item(
         InactiveCartCustomerError,
         CartNotFoundError,
         CartItemNotFoundError,
+        CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
     ) as exc:
         _raise_cart_error(exc)
 
 
 @router.delete(
     "/items",
-    response_model=Cart,
+    response_model=CartResponse,
     status_code=status.HTTP_200_OK,
     summary="Clear cart",
     description="Remove all items from the authenticated customer's active cart.",
     responses={404: {"description": "Active cart not found"}},
 )
-def clear_cart(customer: CurrentCustomer) -> Cart:
+def clear_cart(customer: CurrentCustomer) -> CartResponse:
     try:
         return service.clear_cart(customer.id)
     except (

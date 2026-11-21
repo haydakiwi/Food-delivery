@@ -311,3 +311,32 @@ def test_cart_survives_repository_restart(cart_service):
 
     assert saved["id"] == created.id
     assert saved["items"] == [{"menu_item_id": "item_001", "quantity": 2}]
+
+
+def test_cart_total_uses_current_menu_price(cart_service):
+    service, _ = cart_service
+
+    service.add_item("cust_001", "item_001", 2)
+
+    service.menu_item_repository.update(
+        "item_001",
+        {"price": 20.00},
+    )
+
+    cart = service.get_active_cart("cust_001")
+
+    assert cart.subtotal == 40.00
+    assert cart.delivery_fee == 3.99
+    assert cart.total == 43.99
+
+
+def test_empty_cart_has_zero_totals_after_clearing(cart_service):
+    service, _ = cart_service
+
+    service.add_item("cust_001", "item_001", 2)
+    cart = service.clear_cart("cust_001")
+
+    assert cart.items == []
+    assert cart.subtotal == 0.0
+    assert cart.delivery_fee == 0.0
+    assert cart.total == 0.0

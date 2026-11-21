@@ -8,7 +8,7 @@ from app.repositories.cart_repository import (
 from app.repositories.customer_repository import CustomerRepository
 from app.repositories.menu_item_repository import MenuItemRepository
 from app.repositories.restaurant_repository import RestaurantRepository
-from app.schemas.cart import Cart, CartItem
+from app.schemas.cart import Cart, CartItem, CartResponse
 # from app.schemas.customer import Customer
 # from app.schemas.menu_item import MenuItem
 
@@ -68,6 +68,50 @@ class CartService:
         self.restaurant_repository = restaurant_repository
         self.menu_item_repository = menu_item_repository
 
+    def _build_cart_response(self, cart_data: dict) -> CartResponse:
+        """Build a cart response with server-calculated prices."""
+        cart = Cart(**cart_data)
+
+        subtotal = 0.0
+        delivery_fee = 0.0
+
+        if cart.items:
+            restaurant = self.restaurant_repository.get_by_id(
+                cart.restaurant_id
+            )
+
+            if restaurant is None:
+                raise CartRestaurantNotFoundError(cart.restaurant_id)
+
+            delivery_fee = round(float(restaurant["delivery_fee"]), 2)
+
+            for cart_item in cart.items:
+                menu_item = self.menu_item_repository.get_by_id(
+                    cart_item.menu_item_id
+                )
+
+                if menu_item is None:
+                    raise CartMenuItemNotFoundError(
+                        cart_item.menu_item_id
+                    )
+
+                unit_price = round(float(menu_item["price"]), 2)
+                line_total = round(
+                    unit_price * cart_item.quantity, 2
+                )
+                subtotal += line_total
+
+            subtotal = round(subtotal, 2)
+
+        total = round(subtotal + delivery_fee, 2)
+
+        return CartResponse(
+            **cart.model_dump(),
+            subtotal=subtotal,
+            delivery_fee=delivery_fee,
+            total=total,
+        )
+
     def _validate_customer(self, customer_id: str) -> None:
         customer = self.customer_repository.get_by_id(customer_id)
 
@@ -93,26 +137,26 @@ class CartService:
 
         return item
 
-    def get_active_cart(self, customer_id: str) -> Cart | None:
+    def get_active_cart(self, customer_id: str) -> CartResponse | None:
         """Return the customer's active cart, or None if they have no cart."""
         self._validate_customer(customer_id)
 
         cart = self.cart_repository.get_active_by_customer(customer_id)
-        return Cart(**cart) if cart is not None else None
+        return self._build_cart_response(cart) if cart is not None else None
 
-    def create_cart(self, customer_id: str) -> Cart:
+    def create_cart(self, customer_id: str) -> CartResponse:
         """Create an empty active cart for the customer."""
         self._validate_customer(customer_id)
 
         cart = self.cart_repository.create(customer_id)
-        return Cart(**cart)
+        return self._build_cart_response(cart)
 
     def add_item(
         self,
         customer_id: str,
         menu_item_id: str,
         quantity: int = 1,
-    ) -> Cart:
+    ) -> CartResponse:
         """Add an available menu item, creating an active cart if necessary."""
         self._validate_customer(customer_id)
 
@@ -175,14 +219,14 @@ class CartService:
             },
         )
 
-        return Cart(**updated)
+        return self._build_cart_response(updated)
 
     def update_item_quantity(
         self,
         customer_id: str,
         menu_item_id: str,
         quantity: int,
-    ) -> Cart:
+    ) -> CartResponse:
         """Set an existing cart item's quantity."""
         self._validate_customer(customer_id)
 
@@ -217,9 +261,9 @@ class CartService:
                 break
 
         updated = self.cart_repository.update(cart.id, {"items": items})
-        return Cart(**updated)
+        return self._build_cart_response(updated)
 
-    def remove_item(self, customer_id: str, menu_item_id: str) -> Cart:
+    def remove_item(self, customer_id: str, menu_item_id: str) -> CartResponse:
         """Remove one item from the customer's active cart."""
         self._validate_customer(customer_id)
 
@@ -243,9 +287,9 @@ class CartService:
             changes["restaurant_id"] = None
 
         updated = self.cart_repository.update(cart.id, changes)
-        return Cart(**updated)
+        return self._build_cart_response(updated)
 
-    def clear_cart(self, customer_id: str) -> Cart:
+    def clear_cart(self, customer_id: str) -> CartResponse:
         """Remove all items from the customer's active cart."""
         self._validate_customer(customer_id)
 
@@ -254,4 +298,4 @@ class CartService:
             raise CartNotFoundError(customer_id)
 
         updated = self.cart_repository.clear(cart_data["id"])
-        return Cart(**updated)
+        return self._build_cart_response(updated)

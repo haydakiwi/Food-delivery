@@ -44,3 +44,20 @@ class CartItemQuantityUpdate(BaseModel):
     """Request body for changing an item's quantity."""
 
     quantity: int = Field(gt=0, le=MAX_ITEM_QUANTITY)
+
+
+class CartResponse(Cart):
+    """Cart returned by the API, including server-calculated totals."""
+
+    subtotal: float = Field(ge=0)
+    delivery_fee: float = Field(ge=0)
+    total: float = Field(ge=0)
+
+    @model_validator(mode="after")
+    def check_totals(self) -> "CartResponse":
+        expected_total = round(self.subtotal + self.delivery_fee, 2)
+
+        if round(self.total, 2) != expected_total:
+            raise ValueError("total must equal subtotal + delivery_fee")
+
+        return self

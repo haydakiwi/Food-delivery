@@ -142,7 +142,7 @@ def create_cart(customer: CurrentCustomer) -> CartResponse:
 def add_cart_item(
     data: CartItemAdd,
     customer: CurrentCustomer,
-) -> Cart:
+) -> CartResponse:
     try:
         return service.add_item(
             customer.id,
@@ -177,7 +177,7 @@ def update_cart_item(
     menu_item_id: str,
     data: CartItemQuantityUpdate,
     customer: CurrentCustomer,
-) -> Cart:
+) -> CartResponse:
     try:
         return service.update_item_quantity(
             customer.id,
@@ -207,7 +207,7 @@ def update_cart_item(
 def remove_cart_item(
     menu_item_id: str,
     customer: CurrentCustomer,
-) -> Cart:
+) -> CartResponse:
     try:
         return service.remove_item(customer.id, menu_item_id)
     except (
@@ -227,7 +227,7 @@ def remove_cart_item(
     description="Remove all items from the authenticated customer's active cart.",
     responses={404: {"description": "Active cart not found"}},
 )
-def clear_cart(customer: CurrentCustomer) -> Cart:
+def clear_cart(customer: CurrentCustomer) -> CartResponse:
     try:
         return service.clear_cart(customer.id)
     except (

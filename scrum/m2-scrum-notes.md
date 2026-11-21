@@ -60,9 +60,9 @@
   (PR #51), reviewed and merged after error-handling and test feedback.
 - Identified remaining gaps: frontend cart quantity/remove/clear controls and
   totals display, showing the created order after checkout, a
-  `GET /orders/{order_id}` endpoint, README updates for M2, an integrated test
-  for every member, Project Board updates, and M2 scrum notes.
-
+    `GET /orders/{order_id}` endpoint, README updates for M2, integrated
+  workflow tests, Project Board updates, and M2 scrum notes.
+  
 ### Assignments
 - **Hayden:** frontend cart controls and totals, order display after checkout,
   and an integrated workflow test.

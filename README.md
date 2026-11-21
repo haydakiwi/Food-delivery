@@ -149,8 +149,10 @@ The frontend favours functionality over visual design. It provides:
 - customer registration and sign-in (the bearer token is kept in the browser);
 - restaurant listing, search, and cuisine/open-status filtering;
 - restaurant details, menus, and menu items;
-- adding menu items to the cart and viewing the cart;
-- checkout and the customer's order history;
+- adding menu items to the cart, updating item quantities, removing items,
+  and clearing the cart;
+- the backend-calculated subtotal, delivery fee, and total for the cart;
+- checkout, showing the created order's ID and status, then refreshing the cart and the customer's order history;
 - a create/update restaurant form that calls the management API.
 
 No data is hard-coded into the frontend. The browser calls the FastAPI
@@ -207,7 +209,8 @@ The application paths can be overridden with:
 
 Each data file has exactly one owning repository, built on the shared
 `JsonRepository` base. IDs such as `cust_001`, `cart_001`, and `ord_001` are
-stored in the files and never reused, so relationships survive restarts.
+stored in the files and generated using the highest existing ID plus one to
+avoid reuse during normal operation, so relationships survive restarts.
 Writes go to a temporary file first and then replace the original, so a crash
 cannot leave a half-written file.
 

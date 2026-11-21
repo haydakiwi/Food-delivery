@@ -1,11 +1,31 @@
 # Food Delivery API
 
-Team: **Food Delivery**
+Team: **Commit Crew**
 
 The project uses the required **Route -> Service -> Repository -> JSON**
 architecture. Milestone 1 provides restaurant discovery and menu browsing.
-Milestone 2 adds customer accounts, authentication, and authorization while
-preserving the same layered design.
+Milestone 2 integrates these into one working system: customer accounts,
+authentication and authorization, a shopping cart with backend-calculated
+totals, checkout, and persisted orders, all reachable through the REST API and
+the browser frontend.
+
+## M2 integrated workflow
+
+```text
+Customer -> Restaurant -> Menu -> Cart -> Checkout -> Order
+```
+
+1. Register (`POST /customers/register`) and sign in (`POST /auth/login`).
+2. Browse, search, and filter restaurants, then open a menu.
+3. Add menu items to the cart; the backend returns the subtotal, delivery fee,
+   and total.
+4. Check out (`POST /checkout`). Prices are re-read from the current menu, the
+   order is saved, and only then is the cart closed.
+5. Retrieve the new order (`GET /orders/{order_id}`) and the order history
+   (`GET /orders`). Orders keep the price paid even if the menu changes later.
+
+`tests/test_end_to_end_workflow.py` runs this whole flow through the API,
+restarts the application, and checks the order is still there.
 
 ## Requirements
 
@@ -93,17 +113,25 @@ bearer token using `Authorization: Bearer <access_token>`.
 | DELETE | `/carts/items` | Clear the active cart |
 | POST | `/checkout` | Create an order from the active cart |
 | GET | `/orders` | Retrieve the signed-in customer's order history |
+| GET | `/orders/{order_id}` | Retrieve one of the signed-in customer's orders |
 
 Cart operations enforce business rules, including allowing items from only
-one restaurant per cart, checking menu-item availability, and limiting item
-quantities to 50.
+one restaurant per cart, checking menu-item availability, rejecting
+deactivated customers, allowing one active cart per customer, and limiting
+item quantities to 1–50.
+
+Every cart response includes `subtotal`, `delivery_fee`, and `total`,
+calculated by the backend from current menu prices, so clients never
+calculate prices themselves.
 
 Checkout validates the cart and calculates item prices and delivery fees using
 current server-side data. A delivery address may optionally be supplied in the
 checkout request.
 
 Orders are associated with the customer who placed them. Customers can only
-retrieve their own order history, which is returned newest first.
+retrieve their own orders: history is returned newest first, and requesting
+another customer's order returns 404 so order IDs are not revealed. Each order
+stores the item names and unit prices at checkout time.
 
 In M2, newly created orders have the status `placed`. The full order-status
 lifecycle is deferred to M3.
@@ -116,27 +144,31 @@ The restaurant list supports:
 
 ## Frontend
 
-The frontend is intentionally simple because M1 prioritizes functionality over
-visual design. It provides:
+The frontend favours functionality over visual design. It provides:
 
-- restaurant listing from the real API;
-- search and cuisine/open-status filtering;
-- restaurant details;
-- restaurant menu and menu-item display;
+- customer registration and sign-in (the bearer token is kept in the browser);
+- restaurant listing, search, and cuisine/open-status filtering;
+- restaurant details, menus, and menu items;
+- adding menu items to the cart and viewing the cart;
+- checkout and the customer's order history;
 - a create/update restaurant form that calls the management API.
 
-Restaurant data is never hard-coded into the frontend. The browser calls the
-FastAPI application with `fetch()` and displays the returned API data.
+No data is hard-coded into the frontend. The browser calls the FastAPI
+application with `fetch()` and displays the returned API data, including API
+error messages. Business rules and prices are enforced by the backend only.
 
 ## Management API
 
-The management form is designed to use the team's restaurant-management
-endpoints:
+The management form and the restaurant-management endpoints are:
 
 ```text
-POST /restaurants
-PATCH  /restaurants/{restaurant_id}
+POST  /restaurants
+PATCH /restaurants/{restaurant_id}
+POST  /restaurants/{restaurant_id}/menu/items
+PATCH /restaurants/{restaurant_id}/menu/items/{item_id}
 ```
+
+These management endpoints do not currently require authentication.
 
 The request body contains the restaurant fields:
 
@@ -151,8 +183,6 @@ The request body contains the restaurant fields:
   "address": "123 Main St"
 }
 ```
-
-The management endpoints are implemented in the team's management feature.
 
 ## Data and configuration
 
@@ -174,6 +204,12 @@ The application paths can be overridden with:
 - `AUTH_SECRET` — set this to a private random value outside local development
 - `AUTH_TOKEN_TTL_SECONDS` — bearer-token lifetime (default: 3600 seconds)
 - `PASSWORD_HASH_ITERATIONS` — PBKDF2 work factor (default: 100000)
+
+Each data file has exactly one owning repository, built on the shared
+`JsonRepository` base. IDs such as `cust_001`, `cart_001`, and `ord_001` are
+stored in the files and never reused, so relationships survive restarts.
+Writes go to a temporary file first and then replace the original, so a crash
+cannot leave a half-written file.
 
 Tests use temporary files and do not modify committed application data.
 
@@ -213,7 +249,7 @@ Food-delivery/
 |   |-- index.html                  # Browser UI
 |   |-- app.js                      # API integration
 |   `-- styles.css                  # Basic presentation
-|-- docs/                           # M1 documentation
+|-- docs/                           # Decision Receipt and provenance
 |-- scrum/                          # Scrum meeting notes
 |-- tests/                          # Automated tests
 |-- requirements.txt
@@ -232,28 +268,36 @@ Frontend
    -> JSON data
 ```
 
-For example, selecting a restaurant in the frontend calls
-`GET /restaurants/{restaurant_id}` and
-`GET /restaurants/{restaurant_id}/menu`.
+For example, clicking **Checkout** in the frontend calls `POST /checkout`:
+
+```text
+routes/checkout.py::checkout            (authenticates the customer)
+   -> services/checkout_service.py::checkout
+        -> CustomerRepository, CartRepository, RestaurantRepository,
+           MenuItemRepository                  (validate, re-read prices)
+        -> OrderRepository.create             (writes data/orders.json)
+        -> CartRepository.close               (writes data/carts.json)
+```
 
 The route handles HTTP concerns, the service contains business logic, the
 repository reads/writes persistent data, and Pydantic models define the API
 contract.
 
-## M1 submission checklist
+## M2 submission checklist
 
-Before creating the immutable `m1-vertical-slice` tag:
+Before creating the immutable `m2-integrated-system` tag:
 
-1. Run `python -m pytest -v`.
-2. Start the application and test `/health`, `/restaurants`, `/docs`, and the
-   frontend.
-3. Verify the frontend can retrieve restaurants and menus from the API.
-4. Verify the management form against the team's management endpoints.
-5. Ensure every implementation feature is linked to a GitHub issue.
-6. Ensure merged code was reviewed through a pull request.
-7. Update `PROVENANCE.md` and the Decision Receipt.
-8. Update all scrum notes.
-9. Create the `m1-vertical-slice` tag only after the final submission commit.
-10. Record the full commit SHA in the Canvas PDF.
+1. Run `python -m pytest -v` and confirm CI is green on `main`.
+2. Start the application and walk through the full workflow in the frontend:
+   register, sign in, browse a menu, add to cart, check out, view orders.
+3. Demonstrate the business rules: a deactivated customer (`cust_003`), an
+   unavailable item, an invalid quantity, items from two restaurants, and a
+   price change before checkout.
+4. Restart the application and confirm orders and carts persist.
+5. Ensure every feature is linked to a GitHub issue and merged through a
+   reviewed pull request, and the Project Board is up to date.
+6. Update `docs/PROVENANCE.md`, `docs/DECISION_RECEIPT.md`, and the scrum notes.
+7. Create the `m2-integrated-system` tag only after the final submission commit.
+8. Record the full commit SHA in the Canvas submission.
 
 Do not commit secrets, credentials, environment files, or access tokens.

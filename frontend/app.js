@@ -331,9 +331,7 @@ async function addToCart(menuItemId) {
       return;
     }
 
-    const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
-
-    $("cart-total").textContent = `${totalItems} item(s) in cart`;
+    await loadCart();
   } catch (error) {
     console.error(error);
   }
@@ -362,21 +360,96 @@ async function loadCart() {
         (item) => `
           <div class="menu-item">
             <strong>${escapeHtml(item.menu_item_id)}</strong><br>
-            Quantity: ${item.quantity}
+
+            <button
+              onclick="updateQuantity(
+                '${escapeHtml(item.menu_item_id)}',
+                ${item.quantity - 1}
+              )"
+            >
+              -
+            </button>
+
+            ${item.quantity}
+
+            <button
+              onclick="updateQuantity(
+                '${escapeHtml(item.menu_item_id)}',
+                ${item.quantity + 1}
+              )"
+            >
+              +
+            </button>
+
+            <br>
+
+            <button
+              onclick="removeFromCart(
+                '${escapeHtml(item.menu_item_id)}'
+              )"
+            >
+              Remove
+            </button>
           </div>
         `,
       )
       .join("");
 
-    const totalItems = result.items.reduce(
-      (sum, item) => sum + item.quantity,
-      0,
-    );
-
-    $("cart-total").textContent = `${totalItems} item(s) in cart`;
+    $("cart-total").innerHTML = `
+      <strong>Subtotal:</strong> $${result.subtotal.toFixed(2)}<br>
+      <strong>Delivery Fee:</strong> $${result.delivery_fee.toFixed(2)}<br>
+      <strong>Total:</strong> $${result.total.toFixed(2)}
+    `;
   } catch (error) {
     $("cart-total").textContent = error.message;
   }
+}
+
+async function removeFromCart(menuItemId) {
+  const token = localStorage.getItem("token");
+
+  await api(`/carts/items/${encodeURIComponent(menuItemId)}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  await loadCart();
+}
+
+async function updateQuantity(menuItemId, quantity) {
+  if (quantity <= 0) {
+    await removeFromCart(menuItemId);
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  await api(`/carts/items/${encodeURIComponent(menuItemId)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      quantity,
+    }),
+  });
+
+  await loadCart();
+}
+
+async function clearCart() {
+  const token = localStorage.getItem("token");
+
+  await api("/carts/items", {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  await loadCart();
 }
 
 async function checkout() {
@@ -390,7 +463,14 @@ async function checkout() {
       },
     });
 
-    $("checkout-status").textContent = "Checkout successful";
+    $("checkout-status").innerHTML = `
+      Checkout successful<br>
+      Order ID: ${escapeHtml(result.id)}<br>
+      Status: ${escapeHtml(result.status)}
+    `;
+
+    await loadCart();
+    await loadOrders();
   } catch (error) {
     $("checkout-status").textContent = error.message;
   }
@@ -460,4 +540,5 @@ $("register-btn").addEventListener("click", registerCustomer);
 $("load-cart-btn").addEventListener("click", loadCart);
 $("checkout-btn").addEventListener("click", checkout);
 $("orders-btn").addEventListener("click", loadOrders);
+$("clear-cart-btn").addEventListener("click", clearCart);
 loadRestaurants();

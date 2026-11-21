@@ -1,16 +1,75 @@
+import json
 import uuid
+from collections.abc import Callable
+from pathlib import Path
+
+import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
+@pytest.fixture
+def customers_data_file(tmp_path: Path) -> Path:
+    records = json.loads(
+        Path("data/customers.json").read_text(encoding="utf-8")
+    )
+
+    path = tmp_path / "customers.json"
+    path.write_text(
+        json.dumps(records),
+        encoding="utf-8",
+    )
+
+    return path
 
 
-def test_customer_to_order_workflow():
+@pytest.fixture
+def carts_data_file(tmp_path: Path) -> Path:
+    path = tmp_path / "carts.json"
+
+    path.write_text(
+        "[]",
+        encoding="utf-8",
+    )
+
+    return path
+
+
+@pytest.fixture
+def orders_data_file(tmp_path: Path) -> Path:
+    path = tmp_path / "orders.json"
+
+    path.write_text(
+        "[]",
+        encoding="utf-8",
+    )
+
+    return path
+
+
+@pytest.fixture
+def workflow_client(
+    client_factory: Callable[..., TestClient],
+    restaurant_data_file: Path,
+    menu_items_data_file: Path,
+    customers_data_file: Path,
+    carts_data_file: Path,
+    orders_data_file: Path,
+) -> TestClient:
+    return client_factory(
+        restaurant_data_file,
+        menu_items_data_file,
+        customers_data_file,
+        carts_data_file,
+        orders_data_file,
+    )
+
+
+def test_customer_to_order_workflow(
+    workflow_client: TestClient,
+):
     email = f"workflow-{uuid.uuid4()}@example.com"
 
-    # Register
-    register_response = client.post(
+    registration = workflow_client.post(
         "/customers/register",
         json={
             "name": "Workflow Test",
@@ -30,10 +89,9 @@ def test_customer_to_order_workflow():
         },
     )
 
-    assert register_response.status_code in [200, 201]
+    assert registration.status_code == 201
 
-    # Login
-    login_response = client.post(
+    login = workflow_client.post(
         "/auth/login",
         json={
             "email": email,
@@ -41,72 +99,98 @@ def test_customer_to_order_workflow():
         },
     )
 
-    assert login_response.status_code == 200
+    assert login.status_code == 200
 
-    token = login_response.json()["access_token"]
+    token = login.json()["access_token"]
 
     headers = {
-        "Authorization": f"Bearer {token}"
+        "Authorization": f"Bearer {token}",
     }
 
-    # Browse restaurants
-    restaurants = client.get("/restaurants")
+    restaurants = workflow_client.get(
+        "/restaurants"
+    )
 
     assert restaurants.status_code == 200
+    assert restaurants.json()
 
     restaurant_id = restaurants.json()[0]["id"]
 
-    # Browse menu
-    menu = client.get(
+    menu = workflow_client.get(
         f"/restaurants/{restaurant_id}/menu"
     )
 
     assert menu.status_code == 200
-    assert len(menu.json()["items"]) > 0
+    assert menu.json()["items"]
 
-    menu_item_id = menu.json()["items"][0]["id"]
+    menu_item = menu.json()["items"][0]
 
-    # Add to cart
-    cart_response = client.post(
+    add_to_cart = workflow_client.post(
         "/carts/items",
         headers=headers,
         json={
-            "menu_item_id": menu_item_id,
+            "menu_item_id": menu_item["id"],
             "quantity": 1,
         },
     )
 
-    assert cart_response.status_code == 200
+    assert add_to_cart.status_code == 200
 
-    # Verify cart exists
-    cart = client.get(
+    cart_before_checkout = workflow_client.get(
         "/carts",
         headers=headers,
     )
 
-    assert cart.status_code == 200
+    assert cart_before_checkout.status_code == 200
 
-    # Checkout
-    checkout = client.post(
+    cart_data = cart_before_checkout.json()
+
+    assert cart_data["items"]
+    assert len(cart_data["items"]) == 1
+
+    checkout = workflow_client.post(
         "/checkout",
         headers=headers,
     )
 
     assert checkout.status_code == 201
 
-    order_id = checkout.json()["id"]
+    order = checkout.json()
 
-    # Retrieve order history
-    orders = client.get(
+    assert order["id"]
+    assert order["items"]
+    assert order["total"] > 0
+
+    orders = workflow_client.get(
         "/orders",
         headers=headers,
     )
 
     assert orders.status_code == 200
 
-    returned_order_ids = {
-        order["id"]
-        for order in orders.json()
+    order_ids = {
+        record["id"]
+        for record in orders.json()
     }
 
-    assert order_id in returned_order_ids
+    assert order["id"] in order_ids
+
+    matching_order = next(
+        record
+        for record in orders.json()
+        if record["id"] == order["id"]
+    )
+
+    assert matching_order["items"]
+    assert matching_order["total"] == order["total"]
+
+    cart_after_checkout = workflow_client.get(
+        "/carts",
+        headers=headers,
+    )
+
+    assert cart_after_checkout.status_code == 200
+
+    final_cart = cart_after_checkout.json()
+
+    assert final_cart is None

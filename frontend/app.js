@@ -19,10 +19,7 @@ async function api(path, options = {}) {
     : await response.text();
 
   if (!response.ok) {
-    const detail = typeof body === "object" && body !== null
-      ? body.detail || JSON.stringify(body)
-      : body;
-    throw new Error(detail || `Request failed (${response.status})`);
+    throw new Error(JSON.stringify(body, null, 2));
   }
 
   return body;
@@ -53,6 +50,30 @@ function restaurantCard(restaurant) {
   return card;
 }
 
+async function login() {
+  try {
+    const result = await api("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: $("login-email").value,
+        password: $("login-password").value,
+      }),
+    });
+
+    localStorage.setItem("token", result.access_token);
+
+    $("login-status").textContent = "Login successful";
+  } catch (error) {
+    try {
+      const parsed = JSON.parse(error.message);
+
+      $("login-status").textContent = parsed.detail;
+    } catch {
+      $("login-status").textContent = error.message;
+    }
+  }
+}
+
 async function loadRestaurants() {
   const params = new URLSearchParams();
   const search = $("search").value.trim();
@@ -76,10 +97,13 @@ async function loadRestaurants() {
     }
 
     const fragment = document.createDocumentFragment();
-    restaurants.forEach((restaurant) => fragment.appendChild(restaurantCard(restaurant)));
+    restaurants.forEach((restaurant) =>
+      fragment.appendChild(restaurantCard(restaurant)),
+    );
     $("restaurant-list").appendChild(fragment);
   } catch (error) {
-    $("list-status").textContent = `Could not load restaurants: ${error.message}`;
+    $("list-status").textContent =
+      `Could not load restaurants: ${error.message}`;
     $("list-status").classList.add("error");
   }
 }
@@ -92,8 +116,11 @@ async function loadRestaurant(id) {
     ]);
 
     state.selectedRestaurant = restaurant;
+
     $("details-panel").classList.remove("hidden");
+
     $("restaurant-name").textContent = restaurant.name;
+
     $("restaurant-details").innerHTML = `
       <p><strong>Cuisine:</strong> ${escapeHtml(restaurant.cuisine)}</p>
       <p><strong>Rating:</strong> ${restaurant.rating.toFixed(1)}/5</p>
@@ -104,6 +131,7 @@ async function loadRestaurant(id) {
     `;
 
     const menuList = $("menu-list");
+
     menuList.replaceChildren();
 
     if (!menu.items.length) {
@@ -113,16 +141,36 @@ async function loadRestaurant(id) {
 
     menu.items.forEach((item) => {
       const element = document.createElement("article");
+
       element.className = "menu-item";
+
       element.innerHTML = `
         <h4>${escapeHtml(item.name)} — $${item.price.toFixed(2)}</h4>
         <p>${escapeHtml(item.description)}</p>
         <p>${escapeHtml(item.category)} · ${item.is_available ? "Available" : "Unavailable"}</p>
       `;
+
+      const addButton = document.createElement("button");
+
+      if (!item.is_available) {
+        addButton.disabled = true;
+        addButton.textContent = "Unavailable";
+      } else {
+        addButton.textContent = "Add To Cart";
+
+        addButton.addEventListener("click", () => {
+          addToCart(item.id);
+        });
+      }
+
+      element.appendChild(addButton);
+
       menuList.appendChild(element);
     });
 
-    $("details-panel").scrollIntoView({ behavior: "smooth" });
+    $("details-panel").scrollIntoView({
+      behavior: "smooth",
+    });
   } catch (error) {
     alert(`Could not load restaurant: ${error.message}`);
   }
@@ -181,7 +229,8 @@ async function saveRestaurant(event) {
     resetForm();
     await loadRestaurants();
   } catch (error) {
-    $("form-status").textContent = `Could not save restaurant: ${error.message}`;
+    $("form-status").textContent =
+      `Could not save restaurant: ${error.message}`;
     $("form-status").classList.add("error");
   }
 }
@@ -206,12 +255,209 @@ $("clear-filters").addEventListener("click", () => {
   $("open-status").value = "";
   loadRestaurants();
 });
-
 $("close-details").addEventListener("click", () => {
   $("details-panel").classList.add("hidden");
 });
 
+async function registerCustomer() {
+  if (
+    !$("register-name").value.trim() ||
+    !$("register-email").value.trim() ||
+    !$("register-password").value.trim() ||
+    !$("register-phone").value.trim() ||
+    !$("register-street").value.trim() ||
+    !$("register-city").value.trim() ||
+    !$("register-province").value.trim() ||
+    !$("register-postal").value.trim()
+  ) {
+    $("register-status").textContent = "Please fill in all fields.";
+    return;
+  }
+
+  try {
+    await api("/customers/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: $("register-name").value,
+        email: $("register-email").value,
+        password: $("register-password").value,
+        phone: $("register-phone").value,
+
+        addresses: [
+          {
+            label: "Home",
+            street: $("register-street").value,
+            city: $("register-city").value,
+            province: $("register-province").value,
+            postal_code: $("register-postal").value,
+            is_default: true,
+          },
+        ],
+      }),
+    });
+
+    $("register-status").textContent = "Registration successful";
+  } catch (error) {
+    try {
+      const parsed = JSON.parse(error.message);
+
+      $("register-status").textContent = parsed.detail;
+    } catch {
+      $("register-status").textContent = error.message;
+    }
+  }
+}
+
+async function addToCart(menuItemId) {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch("/carts/items", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        menu_item_id: menuItemId,
+        quantity: 1,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.detail || "Could not add item to cart");
+      return;
+    }
+
+    const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
+
+    $("cart-total").textContent = `${totalItems} item(s) in cart`;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function loadCart() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const result = await api("/carts", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!result) {
+      $("cart-items").textContent = "Your cart is empty.";
+
+      $("cart-total").textContent = "";
+
+      return;
+    }
+
+    $("cart-items").innerHTML = result.items
+      .map(
+        (item) => `
+          <div class="menu-item">
+            <strong>${escapeHtml(item.menu_item_id)}</strong><br>
+            Quantity: ${item.quantity}
+          </div>
+        `,
+      )
+      .join("");
+
+    const totalItems = result.items.reduce(
+      (sum, item) => sum + item.quantity,
+      0,
+    );
+
+    $("cart-total").textContent = `${totalItems} item(s) in cart`;
+  } catch (error) {
+    $("cart-total").textContent = error.message;
+  }
+}
+
+async function checkout() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const result = await api("/checkout", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    $("checkout-status").textContent = "Checkout successful";
+  } catch (error) {
+    $("checkout-status").textContent = error.message;
+  }
+}
+
+async function loadOrders() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const result = await api("/orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    $("orders-list").innerHTML = result
+      .map(
+        (order) => `
+    <div class="panel">
+      <h3>${escapeHtml(order.restaurant_name)}</h3>
+
+      <p>
+        <strong>Order ID:</strong> ${escapeHtml(order.id)}
+      </p>
+
+      <p>
+        <strong>Status:</strong> ${escapeHtml(order.status)}
+      </p>
+
+      <p>
+        <strong>Total:</strong> $${order.total}
+      </p>
+
+      <p>
+        <strong>Created:</strong>
+        ${new Date(order.created_at).toLocaleString()}
+      </p>
+
+      <h4>Items</h4>
+
+      <ul>
+        ${order.items
+          .map(
+            (item) => `
+              <li>
+                ${escapeHtml(item.name)}
+                × ${item.quantity}
+                ($${item.line_total})
+              </li>
+            `,
+          )
+          .join("")}
+      </ul>
+    </div>
+  `,
+      )
+      .join("");
+  } catch (error) {
+    $("orders-list").textContent = error.message;
+  }
+}
+
 $("restaurant-form").addEventListener("submit", saveRestaurant);
 $("reset-form").addEventListener("click", resetForm);
-
+$("login-btn").addEventListener("click", login);
+$("register-btn").addEventListener("click", registerCustomer);
+$("load-cart-btn").addEventListener("click", loadCart);
+$("checkout-btn").addEventListener("click", checkout);
+$("orders-btn").addEventListener("click", loadOrders);
 loadRestaurants();

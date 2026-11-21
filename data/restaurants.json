@@ -10,14 +10,14 @@
         "address": "123 Robson St, Vancouver, BC"
     },
     {
-        "id": "rest_002",
-        "name": "Burger Palace",
-        "cuisine": "American",
-        "rating": 4.2,
-        "delivery_time_minutes": 25,
-        "delivery_fee": 1.99,
-        "is_open": true,
-        "address": "456 Main St, Vancouver, BC"
+       "id": "rest_002",
+       "name": "Burger Palace",
+       "cuisine": "American",
+       "rating": 4.2,
+       "delivery_time_minutes": 25,
+       "delivery_fee": 1.99,
+       "is_open": true,
+       "address": "456 Main St, Vancouver, BC"
     },
     {
         "id": "rest_003",
@@ -48,15 +48,5 @@
         "delivery_fee": 1.49,
         "is_open": true,
         "address": "654 Broadway, Vancouver, BC"
-    },
-    {
-        "name": "ags",
-        "cuisine": "sag",
-        "rating": 2.0,
-        "delivery_time_minutes": 123,
-        "delivery_fee": 123.0,
-        "is_open": false,
-        "address": "123",
-        "id": "rest_006"
     }
 ]

@@ -27,6 +27,7 @@ from app.services.cart_service import (
     CartNotFoundError,
     CartQuantityLimitError,
     CartService,
+    CartRestaurantNotFoundError,
     DifferentRestaurantError,
     InactiveCartCustomerError,
 )
@@ -63,6 +64,7 @@ def _raise_cart_error(exc: Exception) -> None:
             CartCustomerNotFoundError,
             CartNotFoundError,
             CartMenuItemNotFoundError,
+            CartRestaurantNotFoundError,
             CartItemNotFoundError,
         ),
     ):
@@ -101,6 +103,8 @@ def get_cart(customer: CurrentCustomer) -> CartResponse | None:
     except (
         CartCustomerNotFoundError,
         InactiveCartCustomerError,
+        CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
     ) as exc:
         _raise_cart_error(exc)
 
@@ -153,6 +157,7 @@ def add_cart_item(
         CartCustomerNotFoundError,
         InactiveCartCustomerError,
         CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
         CartMenuItemUnavailableError,
         DifferentRestaurantError,
         CartQuantityLimitError,
@@ -190,6 +195,7 @@ def update_cart_item(
         CartNotFoundError,
         CartItemNotFoundError,
         CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
         CartMenuItemUnavailableError,
         DifferentRestaurantError,
     ) as exc:
@@ -215,6 +221,8 @@ def remove_cart_item(
         InactiveCartCustomerError,
         CartNotFoundError,
         CartItemNotFoundError,
+        CartMenuItemNotFoundError,
+        CartRestaurantNotFoundError,
     ) as exc:
         _raise_cart_error(exc)
 

@@ -137,7 +137,7 @@ class CartService:
 
         return item
 
-    def get_active_cart(self, customer_id: str) -> Cart | None:
+    def get_active_cart(self, customer_id: str) -> CartResponse | None:
         """Return the customer's active cart, or None if they have no cart."""
         self._validate_customer(customer_id)
 
@@ -156,7 +156,7 @@ class CartService:
         customer_id: str,
         menu_item_id: str,
         quantity: int = 1,
-    ) -> Cart:
+    ) -> CartResponse:
         """Add an available menu item, creating an active cart if necessary."""
         self._validate_customer(customer_id)
 
@@ -226,7 +226,7 @@ class CartService:
         customer_id: str,
         menu_item_id: str,
         quantity: int,
-    ) -> Cart:
+    ) -> CartResponse:
         """Set an existing cart item's quantity."""
         self._validate_customer(customer_id)
 
@@ -263,7 +263,7 @@ class CartService:
         updated = self.cart_repository.update(cart.id, {"items": items})
         return self._build_cart_response(updated)
 
-    def remove_item(self, customer_id: str, menu_item_id: str) -> Cart:
+    def remove_item(self, customer_id: str, menu_item_id: str) -> CartResponse:
         """Remove one item from the customer's active cart."""
         self._validate_customer(customer_id)
 
@@ -289,7 +289,7 @@ class CartService:
         updated = self.cart_repository.update(cart.id, changes)
         return self._build_cart_response(updated)
 
-    def clear_cart(self, customer_id: str) -> Cart:
+    def clear_cart(self, customer_id: str) -> CartResponse:
         """Remove all items from the customer's active cart."""
         self._validate_customer(customer_id)
 

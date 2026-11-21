@@ -117,6 +117,22 @@ def test_customer_can_add_item_and_cart_is_created_automatically(
         {"menu_item_id": "item_001", "quantity": 2}
     ]
 
+def test_cart_response_includes_calculated_totals(
+    cart_api_client: TestClient,
+):
+    token = _login(cart_api_client)
+    response = cart_api_client.post(
+        "/carts/items",
+        headers=_headers(token),
+        json={"menu_item_id": "item_001", "quantity": 2},
+    )
+
+    assert response.status_code == 200
+
+    cart = response.json()
+    assert cart["subtotal"] == 33.98
+    assert cart["delivery_fee"] == 3.99
+    assert cart["total"] == 37.97
 
 def test_adding_existing_item_increments_quantity(
     cart_api_client: TestClient,

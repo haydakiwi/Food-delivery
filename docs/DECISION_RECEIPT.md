@@ -393,6 +393,17 @@ management.
 
 **Evidence:** PR #33 and review-response commits `eae1452` and `dab1ffd`.
 
+Jay's review of PR #33 provides additional peer-review evidence. The review
+identified hard-coded registration data, unsafe rendering of API-provided
+order values, missing handling for a `null` active-cart response, an accidental
+test restaurant in seed data, missing required-field validation, and an
+unescaped cart item ID. The resulting changes collected registration values
+from the form, escaped dynamic values, handled an empty cart, disabled
+unavailable items, restored the committed seed data, added registration
+validation, and escaped the cart item ID. Evidence is recorded in the PR #33
+conversation and review-response commits `eae1452`, `99b5d18`, `b8d20f3`, and
+`dab1ffd`.
+
 ## 6. Verification summary
 
 The M2 implementation is supported by repository, service, API, authorization,
@@ -413,8 +424,10 @@ These items are not claimed as complete by this receipt:
 
 - the cart API returns stored item references and quantities but not an
   authoritative cart subtotal/total;
-- the frontend does not yet provide quantity-update, remove-item, or clear-cart
-  controls;
+- the frontend does not yet provide quantity-update or remove-item controls,
+  although the backend supports both operations;
+- the frontend also lacks a clear-cart control, although the backend supports
+  clearing the active cart;
 - the order API returns customer order history but has no
   `GET /orders/{order_id}` endpoint;
 - checkout has no cross-file rollback if the order saves and cart closure then

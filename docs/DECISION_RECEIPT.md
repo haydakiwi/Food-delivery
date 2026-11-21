@@ -434,6 +434,6 @@ These items are not claimed as complete by this receipt:
   fails; and
 - JSON persistence has no concurrent-writer locking.
 
-The first three are M2 requirement gaps to resolve before the assessed tag.
+The first four are M2 requirement gaps to resolve before the assessed tag.
 The final two are documented consistency limitations rather than behaviours
 the implementation claims to provide.
